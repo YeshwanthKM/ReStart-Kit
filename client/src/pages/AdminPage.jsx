@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   ShieldCheck, 
   Users, 
@@ -22,6 +23,7 @@ import {
 
 export default function AdminPage() {
   const { user: currentAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
@@ -124,14 +126,14 @@ export default function AdminPage() {
     return name.includes(query) || email.includes(query) || city.includes(query);
   });
 
-  const filteredTemplates = templates.filter(t => {
-    if (!t) return false;
+  const filteredTemplates = templates.filter(item => {
+    if (!item) return false;
     const query = searchQuery.trim().toLowerCase();
     if (!query) return true;
 
-    const title = (t.title || '').toLowerCase();
-    const desc = (t.description || '').toLowerCase();
-    const pillarName = (t.pillar?.name || '').toLowerCase();
+    const title = (item.title || '').toLowerCase();
+    const desc = (item.description || '').toLowerCase();
+    const pillarName = (item.pillar?.name || '').toLowerCase();
     return title.includes(query) || desc.includes(query) || pillarName.includes(query);
   });
 
@@ -157,11 +159,11 @@ export default function AdminPage() {
           <div className="space-y-2 max-w-xl">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-purple-700/80 backdrop-blur-sm text-purple-100 rounded-full text-xs font-bold border border-purple-500/40">
               <ShieldCheck className="w-4 h-4 text-purple-300" />
-              <span>Platform Administration Portal</span>
+              <span>{t('nav_admin')}</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">System Oversight & Account Controls</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('admin_title')}</h2>
             <p className="text-purple-200 text-sm leading-relaxed">
-              Manage registered user accounts, remove history to re-register emails, and inspect platform task templates.
+              {t('admin_subtitle')}
             </p>
           </div>
 
@@ -196,7 +198,7 @@ export default function AdminPage() {
           
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500">Total Accounts</span>
+              <span className="text-xs font-semibold text-slate-500">{t('admin_card_total_users')}</span>
               <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center">
                 <Users className="w-4 h-4" />
               </div>
@@ -209,7 +211,7 @@ export default function AdminPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500">Assessments</span>
+              <span className="text-xs font-semibold text-slate-500">{t('admin_card_assessments')}</span>
               <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
                 <ClipboardCheck className="w-4 h-4" />
               </div>
@@ -222,7 +224,7 @@ export default function AdminPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500">Total Tasks</span>
+              <span className="text-xs font-semibold text-slate-500">{t('admin_card_total_tasks')}</span>
               <div className="w-8 h-8 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center">
                 <Layers className="w-4 h-4" />
               </div>
@@ -235,7 +237,7 @@ export default function AdminPage() {
 
           <div className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-slate-500">Task Templates</span>
+              <span className="text-xs font-semibold text-slate-500">{t('admin_card_templates')}</span>
               <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
                 <FileText className="w-4 h-4" />
               </div>
@@ -264,7 +266,7 @@ export default function AdminPage() {
               }`}
             >
               <Users className="w-3.5 h-3.5" />
-              <span>Registered Users ({users.length})</span>
+              <span>{t('admin_tab_users')} ({users.length})</span>
             </button>
 
             <button
@@ -276,7 +278,7 @@ export default function AdminPage() {
               }`}
             >
               <ListFilter className="w-3.5 h-3.5" />
-              <span>Task Templates ({templates.length})</span>
+              <span>{t('admin_tab_templates')} ({templates.length})</span>
             </button>
           </div>
 
@@ -325,14 +327,14 @@ export default function AdminPage() {
               <table className="w-full text-left border-collapse text-xs">
                 <thead>
                   <tr className="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                    <th className="py-3 px-4">User / Name</th>
-                    <th className="py-3 px-4">Email Address</th>
-                    <th className="py-3 px-4">Role</th>
-                    <th className="py-3 px-4">Location / City</th>
-                    <th className="py-3 px-4">Assessment</th>
-                    <th className="py-3 px-4">Generated Tasks</th>
-                    <th className="py-3 px-4">Joined Date</th>
-                    <th className="py-3 px-4 text-right">Account Actions</th>
+                    <th className="py-3 px-4">{t('admin_col_name')}</th>
+                    <th className="py-3 px-4">{t('admin_col_email')}</th>
+                    <th className="py-3 px-4">{t('admin_col_role')}</th>
+                    <th className="py-3 px-4">{t('admin_col_location')}</th>
+                    <th className="py-3 px-4">{t('admin_col_assessment')}</th>
+                    <th className="py-3 px-4">{t('admin_col_tasks')}</th>
+                    <th className="py-3 px-4">{t('admin_col_joined')}</th>
+                    <th className="py-3 px-4 text-right">{t('admin_col_actions')}</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
@@ -413,7 +415,7 @@ export default function AdminPage() {
                             title="Delete user account and clear all history"
                           >
                             <Trash2 className="w-3 h-3" />
-                            <span>Delete Account</span>
+                            <span>{t('admin_btn_delete')}</span>
                           </button>
                         )}
                       </td>
@@ -450,41 +452,41 @@ export default function AdminPage() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
-                  {filteredTemplates.map((t) => (
-                    <tr key={t.id} className="hover:bg-slate-50 transition-colors">
+                  {filteredTemplates.map((item) => (
+                    <tr key={item.id} className="hover:bg-slate-50 transition-colors">
                       
                       {/* Pillar */}
                       <td className="py-3.5 px-4 font-bold text-slate-800">
                         <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px]">
-                          {t.pillar?.name || 'General'}
+                          {item.pillar?.name || 'General'}
                         </span>
                       </td>
 
                       {/* Title & Description */}
                       <td className="py-3.5 px-4 space-y-1">
-                        <div className="font-bold text-slate-900">{t.title}</div>
-                        <div className="text-slate-600 text-[11px] leading-relaxed max-w-md">{t.description}</div>
+                        <div className="font-bold text-slate-900">{item.title}</div>
+                        <div className="text-slate-600 text-[11px] leading-relaxed max-w-md">{item.description}</div>
                       </td>
 
                       {/* Priority */}
                       <td className="py-3.5 px-4">
-                        <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] uppercase tracking-wider border ${getPriorityStyle(t.priority)}`}>
-                          {t.priority}
+                        <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] uppercase tracking-wider border ${getPriorityStyle(item.priority)}`}>
+                          {item.priority}
                         </span>
                       </td>
 
                       {/* Trigger Condition */}
                       <td className="py-3.5 px-4">
-                        {t.triggerNeed || t.triggerGoal ? (
+                        {item.triggerNeed || item.triggerGoal ? (
                           <div className="space-y-0.5">
-                            {t.triggerNeed && (
+                            {item.triggerNeed && (
                               <span className="inline-block px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200 text-[10px] font-mono">
-                                Need: {t.triggerNeed}
+                                Need: {item.triggerNeed}
                               </span>
                             )}
-                            {t.triggerGoal && (
+                            {item.triggerGoal && (
                               <span className="inline-block px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-mono">
-                                Goal: {t.triggerGoal}
+                                Goal: {item.triggerGoal}
                               </span>
                             )}
                           </div>
@@ -495,7 +497,7 @@ export default function AdminPage() {
 
                       {/* Target Timeline */}
                       <td className="py-3.5 px-4 font-semibold text-slate-700">
-                        {t.defaultDaysToComplete || 7} Days
+                        {item.defaultDaysToComplete || 7} Days
                       </td>
 
                     </tr>
