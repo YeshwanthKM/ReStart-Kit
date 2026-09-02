@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, LayoutDashboard, ShieldCheck } from 'lucide-react';
+import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, LayoutDashboard, ShieldCheck, Building2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ currentView, setCurrentView }) {
@@ -36,6 +36,19 @@ export default function Navbar({ currentView, setCurrentView }) {
             }`}
           >
             Overview
+          </button>
+
+          {/* LOCAL RESOURCES LINK FOR ALL USERS */}
+          <button
+            onClick={() => setCurrentView('resources')}
+            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
+              currentView === 'resources' 
+                ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+            }`}
+          >
+            <Building2 className="w-4 h-4 text-emerald-600" />
+            <span>Local Resources</span>
           </button>
 
           {isAuthenticated ? (

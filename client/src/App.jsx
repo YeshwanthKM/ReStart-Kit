@@ -8,6 +8,7 @@ import ProfilePage from './pages/ProfilePage';
 import AssessmentPage from './pages/AssessmentPage';
 import RoadmapPage from './pages/RoadmapPage';
 import DashboardPage from './pages/DashboardPage';
+import ResourceDirectoryPage from './pages/ResourceDirectoryPage';
 import AdminPage from './pages/AdminPage';
 import { 
   CheckCircle2, 
@@ -25,6 +26,7 @@ import {
   ClipboardCheck,
   Layers,
   LayoutDashboard,
+  Building2,
   Sparkles
 } from 'lucide-react';
 
@@ -142,6 +144,10 @@ function MainContent({ currentView, setCurrentView }) {
           </ProtectedRoute>
         )}
 
+        {currentView === 'resources' && (
+          <ResourceDirectoryPage />
+        )}
+
         {currentView === 'dashboard' && (
           <ProtectedRoute onRedirect={(view) => setCurrentView(view)}>
             <DashboardPage onNavigate={(view) => setCurrentView(view)} />
@@ -201,6 +207,13 @@ function MainContent({ currentView, setCurrentView }) {
                       >
                         Sign In
                       </button>
+                      <button 
+                        onClick={() => setCurrentView('resources')}
+                        className="px-5 py-2.5 bg-emerald-900/60 hover:bg-emerald-900 text-emerald-100 font-semibold text-sm rounded-xl border border-emerald-500/30 transition-colors flex items-center space-x-1.5"
+                      >
+                        <Building2 className="w-4 h-4 text-emerald-300" />
+                        <span>Browse Local Resources</span>
+                      </button>
                     </>
                   ) : isAdmin ? (
                     <button 
@@ -221,11 +234,11 @@ function MainContent({ currentView, setCurrentView }) {
                       </button>
 
                       <button 
-                        onClick={() => setCurrentView('roadmap')}
+                        onClick={() => setCurrentView('resources')}
                         className="px-5 py-2.5 bg-emerald-700/80 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl border border-emerald-500/50 transition-colors flex items-center space-x-1.5"
                       >
-                        <Layers className="w-4 h-4" />
-                        <span>My Roadmap</span>
+                        <Building2 className="w-4 h-4" />
+                        <span>Local Resources</span>
                       </button>
                     </>
                   )}

@@ -8,6 +8,7 @@ const assessmentRoutes = require('./routes/assessment.routes');
 const taskRoutes = require('./routes/task.routes');
 const adminRoutes = require('./routes/admin.routes');
 const dashboardRoutes = require('./routes/dashboard.routes');
+const resourceRoutes = require('./routes/resource.routes');
 
 // Load environment variables
 dotenv.config();
@@ -31,6 +32,7 @@ app.use('/api/assessment', assessmentRoutes);
 app.use('/api/tasks', taskRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/dashboard', dashboardRoutes);
+app.use('/api/resources', resourceRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
