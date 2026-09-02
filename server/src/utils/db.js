@@ -54,7 +54,7 @@ const seedInitialUsers = async () => {
       await prisma.user.create({
         data: {
           email: 'admin@restartkit.com',
-          password: hashedPassword,
+          passwordHash: hashedPassword,
           role: 'ADMIN',
           profile: {
             create: {
@@ -75,7 +75,7 @@ const seedInitialUsers = async () => {
       await prisma.user.create({
         data: {
           email: 'jordan@example.com',
-          password: userHashedPassword,
+          passwordHash: userHashedPassword,
           role: 'USER',
           profile: {
             create: {
@@ -97,7 +97,7 @@ const seedInitialUsers = async () => {
       await prisma.user.create({
         data: {
           email: 'alex@example.com',
-          password: userHashedPassword,
+          passwordHash: userHashedPassword,
           role: 'USER',
           profile: {
             create: {
@@ -135,5 +135,7 @@ const seedInitialUsers = async () => {
 seedInitialUsers();
 
 module.exports = {
-  prisma
+  prisma,
+  seedInitialUsers,
+  seedDefaultAdmin: seedInitialUsers
 };
