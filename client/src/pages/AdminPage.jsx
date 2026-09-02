@@ -44,12 +44,24 @@ export default function AdminPage() {
         api.get('/admin/task-templates')
       ]);
 
-      if (statsRes.data.success) {
-        setStats(statsRes.data.stats);
-      }
       if (usersRes.data.success) {
-        setUsers(usersRes.data.users || []);
+        const usersList = usersRes.data.users || [];
+        setUsers(usersList);
+
+        // Derive user counts directly from usersList to guarantee 100% alignment across all cards & tabs
+        const totalAdmins = usersList.filter(u => u.role === 'ADMIN').length;
+        const totalStandardUsers = usersList.length - totalAdmins;
+
+        if (statsRes.data.success) {
+          setStats({
+            ...statsRes.data.stats,
+            totalUsers: usersList.length,
+            totalStandardUsers,
+            totalAdmins
+          });
+        }
       }
+
       if (templatesRes.data.success) {
         setTemplates(templatesRes.data.templates || []);
       }
@@ -78,12 +90,20 @@ export default function AdminPage() {
         setSuccessMsg(res.data.message || `User account ${userEmail} deleted successfully.`);
         
         // Optimistically update users table AND stats counter together
-        setUsers(prev => prev.filter(u => u.id !== userId));
-        setStats(prev => prev ? {
-          ...prev,
-          totalUsers: Math.max(0, prev.totalUsers - 1),
-          totalStandardUsers: Math.max(0, prev.totalStandardUsers - 1)
-        } : prev);
+        setUsers(prev => {
+          const updated = prev.filter(u => u.id !== userId);
+          const totalAdmins = updated.filter(u => u.role === 'ADMIN').length;
+          const totalStandardUsers = updated.length - totalAdmins;
+
+          setStats(prevStats => prevStats ? {
+            ...prevStats,
+            totalUsers: updated.length,
+            totalStandardUsers,
+            totalAdmins
+          } : prevStats);
+
+          return updated;
+        });
 
         fetchAdminData();
       }

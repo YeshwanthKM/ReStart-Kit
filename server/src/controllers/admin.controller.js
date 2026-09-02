@@ -93,9 +93,11 @@ const deleteUser = async (req, res) => {
  */
 const getAdminStats = async (req, res) => {
   try {
-    const totalUsers = await prisma.user.count();
-    const totalAdmins = await prisma.user.count({ where: { role: 'ADMIN' } });
+    const allUsers = await prisma.user.findMany({ select: { role: true } });
+    const totalUsers = allUsers.length;
+    const totalAdmins = allUsers.filter(u => u.role === 'ADMIN').length;
     const totalStandardUsers = totalUsers - totalAdmins;
+    
     const completedAssessments = await prisma.assessment.count({ where: { isCompleted: true } });
     const totalTasks = await prisma.userTask.count();
     const completedTasks = await prisma.userTask.count({ where: { isCompleted: true } });
