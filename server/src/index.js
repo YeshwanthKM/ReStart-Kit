@@ -7,7 +7,7 @@ const healthRoutes = require('./routes/health.routes');
 dotenv.config();
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Middleware
 app.use(cors({
@@ -21,6 +21,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/health', healthRoutes);
 
 // Root route
+app.get('/api', (req, res) => {
+  res.json({
+    message: "Welcome to ReStart Kit API",
+    healthCheck: "/api/health"
+  });
+});
+
 app.get('/', (req, res) => {
   res.json({
     message: "Welcome to ReStart Kit API",
@@ -46,8 +53,12 @@ app.use((err, req, res, next) => {
   });
 });
 
-// Start Server
-app.listen(PORT, () => {
-  console.log(`🚀 ReStart Kit Backend Server listening on port ${PORT}`);
-  console.log(`📍 Health Check API available at http://localhost:${PORT}/api/health`);
-});
+// Start Server locally if run directly
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`🚀 ReStart Kit Backend Server listening on port ${PORT}`);
+    console.log(`📍 Health Check API available at http://localhost:${PORT}/api/health`);
+  });
+}
+
+module.exports = app;
