@@ -333,7 +333,7 @@ function MainContent({ currentView, setCurrentView }) {
       {/* Footer */}
       <footer className="bg-white border-t border-slate-200 py-6">
         <div className="max-w-6xl mx-auto px-4 text-center text-xs text-slate-500">
-          <p>ReStart Kit – Guided Path to a Fresh Start &copy; 2026. All rights reserved.</p>
+          <p>ReStart Kit – Guided Path to a Fresh Start</p>
         </div>
       </footer>
     </div>

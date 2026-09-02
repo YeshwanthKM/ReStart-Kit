@@ -25,7 +25,8 @@ export default function LoginPage({ onSuccess, onSwitchToRegister }) {
       if (onSuccess) onSuccess(userData);
     } catch (err) {
       console.error('Login failed:', err);
-      setError(err.message || 'Invalid email or password. Please try again.');
+      const serverMsg = err.response?.data?.message || err.message || 'Invalid email or password. Please try again.';
+      setError(serverMsg);
     } finally {
       setLoading(false);
     }

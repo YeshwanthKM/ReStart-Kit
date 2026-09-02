@@ -61,7 +61,8 @@ export default function RegisterPage({ onSuccess, onSwitchToLogin }) {
       if (onSuccess) onSuccess();
     } catch (err) {
       console.error('Registration failed:', err);
-      setError(err.message || 'Registration failed. Please try again.');
+      const serverMsg = err.response?.data?.message || err.message || 'Registration failed. Please try again.';
+      setError(serverMsg);
     } finally {
       setLoading(false);
     }
