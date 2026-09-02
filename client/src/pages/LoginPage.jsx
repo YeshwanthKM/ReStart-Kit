@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { LogIn, Mail, Lock, AlertCircle, ArrowRight, ShieldCheck } from 'lucide-react';
+import { LogIn, Mail, Lock, AlertCircle, ArrowRight, ShieldCheck, KeyRound } from 'lucide-react';
 
 export default function LoginPage({ onSuccess, onSwitchToRegister }) {
   const { login } = useAuth();
@@ -31,8 +31,33 @@ export default function LoginPage({ onSuccess, onSwitchToRegister }) {
     }
   };
 
+  const fillAdminCredentials = () => {
+    setEmail('admin@restartkit.com');
+    setPassword('adminpassword123');
+  };
+
   return (
-    <div className="max-w-md mx-auto my-12">
+    <div className="max-w-md mx-auto my-10 space-y-4">
+      
+      {/* Admin Demo Credentials Box */}
+      <div className="bg-purple-50 border border-purple-200 rounded-xl p-4 flex items-center justify-between text-xs text-purple-900">
+        <div className="flex items-center space-x-2.5">
+          <ShieldCheck className="w-5 h-5 text-purple-600 flex-shrink-0" />
+          <div>
+            <p className="font-bold">Pre-seeded Admin Account</p>
+            <p className="text-[11px] text-purple-700">admin@restartkit.com | adminpassword123</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={fillAdminCredentials}
+          className="px-2.5 py-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold rounded-lg text-[11px] transition-colors flex items-center space-x-1"
+        >
+          <KeyRound className="w-3 h-3" />
+          <span>Fill</span>
+        </button>
+      </div>
+
       <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
         
         {/* Header */}

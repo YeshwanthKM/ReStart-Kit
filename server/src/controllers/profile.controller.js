@@ -1,5 +1,4 @@
-const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
+const { prisma } = require('../utils/db');
 
 /**
  * Get authenticated user profile
@@ -38,7 +37,7 @@ const getProfile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error fetching profile',
-      error: err.message
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
@@ -99,7 +98,7 @@ const updateProfile = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error updating profile',
-      error: err.message
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };

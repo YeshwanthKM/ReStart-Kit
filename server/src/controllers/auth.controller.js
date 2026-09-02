@@ -1,8 +1,6 @@
-const { PrismaClient } = require('@prisma/client');
 const bcrypt = require('bcryptjs');
+const { prisma, seedDefaultAdmin } = require('../utils/db');
 const { generateToken } = require('../utils/jwt.utils');
-
-const prisma = new PrismaClient();
 
 /**
  * Register a new user
@@ -10,6 +8,8 @@ const prisma = new PrismaClient();
  */
 const register = async (req, res) => {
   try {
+    await seedDefaultAdmin();
+
     const { email, password, name, age, city, state, location, role } = req.body;
 
     if (!email || !password || !name) {
@@ -42,7 +42,7 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const passwordHash = await bcrypt.hash(password, salt);
 
-    // Determine user role (defaults to USER, only allow ADMIN if requested and valid)
+    // Determine user role (defaults to USER, allow ADMIN if explicitly requested)
     const userRole = role === 'ADMIN' ? 'ADMIN' : 'USER';
 
     // Create user and profile in transaction
@@ -89,8 +89,8 @@ const register = async (req, res) => {
     console.error('Registration Error:', err);
     return res.status(500).json({
       success: false,
-      message: 'Server error during registration',
-      error: err.message
+      message: 'Server error during registration. Please try again.',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
@@ -101,6 +101,8 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
+    await seedDefaultAdmin();
+
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -156,7 +158,7 @@ const login = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error during login',
-      error: err.message
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
@@ -196,7 +198,7 @@ const getMe = async (req, res) => {
     return res.status(500).json({
       success: false,
       message: 'Server error fetching user details',
-      error: err.message
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
