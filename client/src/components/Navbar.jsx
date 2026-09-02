@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, ShieldCheck } from 'lucide-react';
+import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, LayoutDashboard, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ currentView, setCurrentView }) {
@@ -56,6 +56,18 @@ export default function Navbar({ currentView, setCurrentView }) {
               ) : (
                 /* STANDARD USER NAVIGATION */
                 <>
+                  <button
+                    onClick={() => setCurrentView('dashboard')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
+                      currentView === 'dashboard' 
+                        ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <LayoutDashboard className="w-4 h-4 text-emerald-600" />
+                    <span>Dashboard</span>
+                  </button>
+
                   <button
                     onClick={() => setCurrentView('roadmap')}
                     className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
