@@ -21,8 +21,8 @@ export default function LoginPage({ onSuccess, onSwitchToRegister }) {
 
     setLoading(true);
     try {
-      await login(email, password);
-      if (onSuccess) onSuccess();
+      const userData = await login(email, password);
+      if (onSuccess) onSuccess(userData);
     } catch (err) {
       console.error('Login failed:', err);
       setError(err.message || 'Invalid email or password. Please try again.');

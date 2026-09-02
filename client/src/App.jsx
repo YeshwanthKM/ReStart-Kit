@@ -122,7 +122,13 @@ function MainContent({ currentView, setCurrentView }) {
 
         {currentView === 'login' && (
           <LoginPage 
-            onSuccess={() => setCurrentView('roadmap')} 
+            onSuccess={(loggedInUser) => {
+              if (loggedInUser?.role === 'ADMIN') {
+                setCurrentView('home');
+              } else {
+                setCurrentView('roadmap');
+              }
+            }} 
             onSwitchToRegister={() => setCurrentView('register')} 
           />
         )}

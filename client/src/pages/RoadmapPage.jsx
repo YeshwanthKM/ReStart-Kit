@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { 
   CheckSquare, 
   Square, 
@@ -15,10 +16,13 @@ import {
   AlertCircle,
   Filter,
   Layers,
-  ArrowRight
+  ArrowRight,
+  ShieldCheck
 } from 'lucide-react';
 
 export default function RoadmapPage({ onNavigateToAssessment }) {
+  const { user, isAdmin } = useAuth();
+
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, progressPercent: 0 });
   const [loading, setLoading] = useState(true);
@@ -52,7 +56,7 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
         setStats(fetchedStats);
 
         // Auto-trigger generation if no tasks exist yet and autoGenIfEmpty is true
-        if (autoGenIfEmpty && fetchedStats.total === 0) {
+        if (autoGenIfEmpty && fetchedStats.total === 0 && !isAdmin) {
           handleGenerateTasks(true);
         }
       }
@@ -292,18 +296,24 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
       {loading || genLoading ? (
         <div className="p-12 bg-white rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-slate-500 space-y-3">
           <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-          <span className="text-sm font-medium">Generating your ReStart Kit roadmap...</span>
+          <span className="text-sm font-medium">Loading your ReStart Kit roadmap...</span>
         </div>
       ) : tasks.length === 0 ? (
         <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-4">
           <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-            <ClipboardCheck className="w-6 h-6" />
+            {isAdmin ? <ShieldCheck className="w-6 h-6 text-purple-600" /> : <Layers className="w-6 h-6 text-emerald-600" />}
           </div>
-          <h3 className="text-lg font-bold text-slate-900">No Tasks Found</h3>
+
+          <h3 className="text-lg font-bold text-slate-900">
+            {isAdmin ? 'Welcome, System Administrator' : 'No Roadmap Tasks Found'}
+          </h3>
+
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-            {stats.total === 0
-              ? 'Please complete your Needs & Goals Assessment to auto-generate your step-by-step fresh start roadmap.'
-              : 'No tasks match your selected filter options.'}
+            {isAdmin
+              ? 'You are logged in as an Administrator. You can complete a sample assessment to test user task generation, or manage community resources.'
+              : stats.total === 0
+                ? 'Please complete your Needs & Goals Assessment to auto-generate your step-by-step fresh start roadmap.'
+                : 'No tasks match your selected filter options.'}
           </p>
 
           <div className="pt-2 flex justify-center space-x-3">
@@ -312,7 +322,7 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
                 onClick={onNavigateToAssessment}
                 className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
               >
-                <span>Take Assessment Now</span>
+                <span>{isAdmin ? 'Take Sample Assessment' : 'Take Assessment Now'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
