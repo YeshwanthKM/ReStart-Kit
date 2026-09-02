@@ -57,7 +57,7 @@ export default function DashboardPage({ onNavigate }) {
     // Optimistic UI update for recommended tasks
     setDashboardData(prev => {
       if (!prev) return prev;
-      const updatedNextSteps = prev.recommendedNextSteps.map(t => {
+      const updatedNextSteps = (prev.recommendedNextSteps || []).map(t => {
         if (t.id === taskId) {
           return { ...t, isCompleted: !t.isCompleted };
         }
@@ -213,7 +213,8 @@ export default function DashboardPage({ onNavigate }) {
             ) : (
               <div className="space-y-3">
                 {recommendedNextSteps.map((task) => {
-                  const pillarColor = getPillarColor(task.pillar?.slug);
+                  const taskSlug = task.pillar?.slug || task.slug;
+                  const pillarColor = getPillarColor(taskSlug);
                   return (
                     <div 
                       key={task.id}
@@ -235,7 +236,7 @@ export default function DashboardPage({ onNavigate }) {
                       <div className="flex-1 space-y-1">
                         <div className="flex items-center justify-between gap-2">
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${pillarColor.bg} ${pillarColor.text}`}>
-                            {task.pillar?.name}
+                            {task.pillar?.name || task.pillarName || 'Pillar'}
                           </span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
                             task.priority === 'HIGH' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
@@ -264,16 +265,18 @@ export default function DashboardPage({ onNavigate }) {
 
             <div className="space-y-4">
               {pillarBreakdown.map((item) => {
-                const Icon = getPillarIcon(item.pillar.slug);
-                const color = getPillarColor(item.pillar.slug);
+                const slug = item.slug || item.pillar?.slug;
+                const name = item.name || item.pillar?.name || 'Pillar';
+                const Icon = getPillarIcon(slug);
+                const color = getPillarColor(slug);
                 return (
-                  <div key={item.pillar.id} className="space-y-2 p-3 bg-slate-50/70 rounded-xl border border-slate-100">
+                  <div key={item.id || name} className="space-y-2 p-3 bg-slate-50/70 rounded-xl border border-slate-100">
                     <div className="flex items-center justify-between text-xs font-bold">
                       <div className="flex items-center space-x-2">
                         <div className={`p-1.5 rounded-lg ${color.bg} ${color.text}`}>
                           <Icon className="w-4 h-4" />
                         </div>
-                        <span className="text-slate-900">{item.pillar.name}</span>
+                        <span className="text-slate-900">{name}</span>
                       </div>
                       <div className="flex items-center space-x-2 text-slate-600">
                         <span>{item.completedTasks}/{item.totalTasks} {t('dash_tasks_done')}</span>
