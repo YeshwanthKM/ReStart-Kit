@@ -48,6 +48,54 @@ const getAllUsers = async (req, res) => {
 };
 
 /**
+ * Delete a user account and clear all associated history (profile, assessment, tasks)
+ * @route DELETE /api/admin/users/:id
+ * @access Protected (ADMIN only)
+ */
+const deleteUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Prevent Admin from deleting their own logged-in account
+    if (id === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'You cannot delete your own logged-in Admin account.'
+      });
+    }
+
+    const targetUser = await prisma.user.findUnique({
+      where: { id }
+    });
+
+    if (!targetUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'User account not found'
+      });
+    }
+
+    // Cascade delete user and all associated history (profile, assessment, tasks)
+    await prisma.user.delete({
+      where: { id }
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `User account ${targetUser.email} and all associated history deleted successfully. You can now re-register with this email.`
+    });
+
+  } catch (err) {
+    console.error('Delete User Error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error deleting user account',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
+
+/**
  * Get system-wide administration statistics
  * @route GET /api/admin/stats
  * @access Protected (ADMIN only)
@@ -120,6 +168,7 @@ const getTaskTemplates = async (req, res) => {
 
 module.exports = {
   getAllUsers,
+  deleteUser,
   getAdminStats,
   getTaskTemplates
 };

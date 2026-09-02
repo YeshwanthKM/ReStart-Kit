@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
+import { useAuth } from '../context/AuthContext';
 import { 
   ShieldCheck, 
   Users, 
@@ -14,15 +15,19 @@ import {
   MapPin,
   Calendar,
   Sparkles,
-  ListFilter
+  ListFilter,
+  Trash2
 } from 'lucide-react';
 
 export default function AdminPage() {
+  const { user: currentAdmin } = useAuth();
+
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
   const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
 
   // Active Tab & Search
   const [activeTab, setActiveTab] = useState('users'); // 'users' | 'templates'
@@ -58,6 +63,26 @@ export default function AdminPage() {
   useEffect(() => {
     fetchAdminData();
   }, []);
+
+  const handleDeleteUser = async (userId, userEmail) => {
+    if (!window.confirm(`Are you sure you want to permanently delete account "${userEmail}"?\n\nThis will clear all profile, assessment, and task history. You can then re-register with this email.`)) {
+      return;
+    }
+
+    setError(null);
+    setSuccessMsg(null);
+    try {
+      const res = await api.delete(`/admin/users/${userId}`);
+      if (res.data.success) {
+        setSuccessMsg(res.data.message || `User account ${userEmail} deleted successfully.`);
+        setUsers(prev => prev.filter(u => u.id !== userId));
+        fetchAdminData();
+      }
+    } catch (err) {
+      console.error('Delete user error:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to delete user account');
+    }
+  };
 
   const filteredUsers = users.filter(u => {
     const query = searchQuery.toLowerCase();
@@ -99,9 +124,9 @@ export default function AdminPage() {
               <ShieldCheck className="w-4 h-4 text-purple-300" />
               <span>Platform Administration Portal</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">System Oversight & Rule Management</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">System Oversight & Account Controls</h2>
             <p className="text-purple-200 text-sm leading-relaxed">
-              Manage registered user accounts, oversee assessment activity, and inspect pre-seeded task recommendation templates.
+              Manage registered user accounts, remove history to re-register emails, and inspect platform task templates.
             </p>
           </div>
 
@@ -115,6 +140,13 @@ export default function AdminPage() {
           </button>
         </div>
       </div>
+
+      {successMsg && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center space-x-3 text-emerald-800 text-sm">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center space-x-3 text-rose-800 text-sm">
@@ -249,6 +281,7 @@ export default function AdminPage() {
                     <th className="py-3 px-4">Assessment</th>
                     <th className="py-3 px-4">Generated Tasks</th>
                     <th className="py-3 px-4">Joined Date</th>
+                    <th className="py-3 px-4 text-right">Account Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-200">
@@ -316,6 +349,22 @@ export default function AdminPage() {
                       {/* Joined Date */}
                       <td className="py-3.5 px-4 text-slate-500 text-[11px]">
                         {new Date(u.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+
+                      {/* Actions */}
+                      <td className="py-3.5 px-4 text-right">
+                        {currentAdmin?.id === u.id ? (
+                          <span className="text-slate-400 italic text-[11px]">Active Admin</span>
+                        ) : (
+                          <button
+                            onClick={() => handleDeleteUser(u.id, u.email)}
+                            className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 font-semibold rounded-lg border border-rose-200 transition-colors inline-flex items-center space-x-1"
+                            title="Delete user account and clear all history"
+                          >
+                            <Trash2 className="w-3 h-3" />
+                            <span>Delete Account</span>
+                          </button>
+                        )}
                       </td>
 
                     </tr>
