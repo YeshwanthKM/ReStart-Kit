@@ -7,6 +7,7 @@ import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import AssessmentPage from './pages/AssessmentPage';
 import RoadmapPage from './pages/RoadmapPage';
+import AdminPage from './pages/AdminPage';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -28,7 +29,7 @@ import {
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 function MainContent({ currentView, setCurrentView }) {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isAdmin } = useAuth();
   const [healthStatus, setHealthStatus] = useState(null);
   const [healthLoading, setHealthLoading] = useState(true);
   const [healthError, setHealthError] = useState(null);
@@ -115,7 +116,7 @@ function MainContent({ currentView, setCurrentView }) {
         {/* View Switcher */}
         {currentView === 'register' && (
           <RegisterPage 
-            onSuccess={() => setCurrentView('assessment')} 
+            onSuccess={() => setCurrentView(user?.role === 'ADMIN' ? 'admin' : 'assessment')} 
             onSwitchToLogin={() => setCurrentView('login')} 
           />
         )}
@@ -124,13 +125,19 @@ function MainContent({ currentView, setCurrentView }) {
           <LoginPage 
             onSuccess={(loggedInUser) => {
               if (loggedInUser?.role === 'ADMIN') {
-                setCurrentView('home');
+                setCurrentView('admin');
               } else {
                 setCurrentView('roadmap');
               }
             }} 
             onSwitchToRegister={() => setCurrentView('register')} 
           />
+        )}
+
+        {currentView === 'admin' && (
+          <ProtectedRoute requireAdmin={true} onRedirect={(view) => setCurrentView(view)}>
+            <AdminPage />
+          </ProtectedRoute>
         )}
 
         {currentView === 'roadmap' && (
@@ -187,6 +194,14 @@ function MainContent({ currentView, setCurrentView }) {
                         Sign In
                       </button>
                     </>
+                  ) : isAdmin ? (
+                    <button 
+                      onClick={() => setCurrentView('admin')}
+                      className="px-5 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
+                    >
+                      <ShieldCheck className="w-4 h-4 text-white" />
+                      <span>Open Admin Portal</span>
+                    </button>
                   ) : (
                     <>
                       <button 

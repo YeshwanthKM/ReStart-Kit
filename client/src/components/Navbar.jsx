@@ -1,5 +1,5 @@
 import React from 'react';
-import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, ShieldAlert } from 'lucide-react';
+import { Compass, User, LogOut, LogIn, UserPlus, ClipboardCheck, Layers, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 
 export default function Navbar({ currentView, setCurrentView }) {
@@ -40,29 +40,47 @@ export default function Navbar({ currentView, setCurrentView }) {
 
           {isAuthenticated ? (
             <>
-              <button
-                onClick={() => setCurrentView('roadmap')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
-                  currentView === 'roadmap' 
-                    ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <Layers className="w-4 h-4 text-emerald-600" />
-                <span>My Roadmap</span>
-              </button>
+              {/* ADMIN NAVIGATION */}
+              {isAdmin ? (
+                <button
+                  onClick={() => setCurrentView('admin')}
+                  className={`px-3 py-1.5 rounded-lg text-sm font-bold transition-colors flex items-center space-x-1.5 ${
+                    currentView === 'admin' 
+                      ? 'bg-purple-100 text-purple-900 font-bold border border-purple-300' 
+                      : 'bg-purple-50 text-purple-800 hover:bg-purple-100 border border-purple-200'
+                  }`}
+                >
+                  <ShieldCheck className="w-4 h-4 text-purple-600" />
+                  <span>Admin Portal</span>
+                </button>
+              ) : (
+                /* STANDARD USER NAVIGATION */
+                <>
+                  <button
+                    onClick={() => setCurrentView('roadmap')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
+                      currentView === 'roadmap' 
+                        ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <Layers className="w-4 h-4 text-emerald-600" />
+                    <span>My Roadmap</span>
+                  </button>
 
-              <button
-                onClick={() => setCurrentView('assessment')}
-                className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
-                  currentView === 'assessment' 
-                    ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                }`}
-              >
-                <ClipboardCheck className="w-4 h-4 text-emerald-600" />
-                <span>Assessment</span>
-              </button>
+                  <button
+                    onClick={() => setCurrentView('assessment')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors flex items-center space-x-1.5 ${
+                      currentView === 'assessment' 
+                        ? 'bg-emerald-50 text-emerald-800 font-semibold border border-emerald-200' 
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    }`}
+                  >
+                    <ClipboardCheck className="w-4 h-4 text-emerald-600" />
+                    <span>Assessment</span>
+                  </button>
+                </>
+              )}
 
               <button
                 onClick={() => setCurrentView('profile')}
