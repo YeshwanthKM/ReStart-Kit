@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
 import AssessmentPage from './pages/AssessmentPage';
+import RoadmapPage from './pages/RoadmapPage';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -19,7 +20,9 @@ import {
   Compass,
   ArrowRight,
   UserCheck,
-  ClipboardCheck
+  ClipboardCheck,
+  Layers,
+  Sparkles
 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -119,14 +122,20 @@ function MainContent({ currentView, setCurrentView }) {
 
         {currentView === 'login' && (
           <LoginPage 
-            onSuccess={() => setCurrentView('assessment')} 
+            onSuccess={() => setCurrentView('roadmap')} 
             onSwitchToRegister={() => setCurrentView('register')} 
           />
         )}
 
+        {currentView === 'roadmap' && (
+          <ProtectedRoute onRedirect={(view) => setCurrentView(view)}>
+            <RoadmapPage onNavigateToAssessment={() => setCurrentView('assessment')} />
+          </ProtectedRoute>
+        )}
+
         {currentView === 'assessment' && (
           <ProtectedRoute onRedirect={(view) => setCurrentView(view)}>
-            <AssessmentPage onComplete={() => setCurrentView('home')} />
+            <AssessmentPage onComplete={() => setCurrentView('roadmap')} />
           </ProtectedRoute>
         )}
 
@@ -175,18 +184,19 @@ function MainContent({ currentView, setCurrentView }) {
                   ) : (
                     <>
                       <button 
-                        onClick={() => setCurrentView('assessment')}
+                        onClick={() => setCurrentView('roadmap')}
                         className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
                       >
-                        <ClipboardCheck className="w-4 h-4 text-emerald-700" />
-                        <span>Take Assessment</span>
+                        <Layers className="w-4 h-4 text-emerald-700" />
+                        <span>View My Roadmap</span>
                       </button>
 
                       <button 
-                        onClick={() => setCurrentView('profile')}
-                        className="px-5 py-2.5 bg-emerald-700/80 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl border border-emerald-500/50 transition-colors"
+                        onClick={() => setCurrentView('assessment')}
+                        className="px-5 py-2.5 bg-emerald-700/80 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl border border-emerald-500/50 transition-colors flex items-center space-x-1.5"
                       >
-                        Profile Settings
+                        <ClipboardCheck className="w-4 h-4" />
+                        <span>Assessment</span>
                       </button>
                     </>
                   )}

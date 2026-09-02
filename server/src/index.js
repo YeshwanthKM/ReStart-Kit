@@ -5,6 +5,7 @@ const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
 const assessmentRoutes = require('./routes/assessment.routes');
+const taskRoutes = require('./routes/task.routes');
 
 // Load environment variables
 dotenv.config();
@@ -25,6 +26,7 @@ app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
 app.use('/api/assessment', assessmentRoutes);
+app.use('/api/tasks', taskRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
