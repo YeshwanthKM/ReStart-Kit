@@ -16,7 +16,8 @@ import {
   Calendar,
   Sparkles,
   ListFilter,
-  Trash2
+  Trash2,
+  X
 } from 'lucide-react';
 
 export default function AdminPage() {
@@ -93,18 +94,24 @@ export default function AdminPage() {
   };
 
   const filteredUsers = users.filter(u => {
-    const query = searchQuery.toLowerCase();
-    const name = u.profile?.name ? u.profile.name.toLowerCase() : '';
-    const email = u.email.toLowerCase();
-    const city = u.profile?.city ? u.profile.city.toLowerCase() : '';
+    if (!u) return false;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+
+    const name = (u.profile?.name || '').toLowerCase();
+    const email = (u.email || '').toLowerCase();
+    const city = (u.profile?.city || '').toLowerCase();
     return name.includes(query) || email.includes(query) || city.includes(query);
   });
 
   const filteredTemplates = templates.filter(t => {
-    const query = searchQuery.toLowerCase();
-    const title = t.title.toLowerCase();
-    const desc = t.description.toLowerCase();
-    const pillarName = t.pillar?.name ? t.pillar.name.toLowerCase() : '';
+    if (!t) return false;
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) return true;
+
+    const title = (t.title || '').toLowerCase();
+    const desc = (t.description || '').toLowerCase();
+    const pillarName = (t.pillar?.name || '').toLowerCase();
     return title.includes(query) || desc.includes(query) || pillarName.includes(query);
   });
 
@@ -254,15 +261,23 @@ export default function AdminPage() {
           </div>
 
           {/* Search Box */}
-          <div className="relative w-full sm:w-64">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+          <div className="relative w-full sm:w-64 flex items-center">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={activeTab === 'users' ? 'Search by name, email, city...' : 'Search template title, pillar...'}
-              className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
+              className="w-full pl-9 pr-8 py-1.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
+            {searchQuery && (
+              <button
+                onClick={() => setSearchQuery('')}
+                className="absolute right-2.5 text-slate-400 hover:text-slate-600"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
         </div>
 
@@ -274,8 +289,16 @@ export default function AdminPage() {
               <span className="text-xs font-medium">Fetching registered user directory...</span>
             </div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-10 text-center text-slate-500 text-xs">
-              No registered users found matching your search.
+            <div className="p-10 text-center text-slate-500 text-xs space-y-2">
+              <p>No registered users found matching your search.</p>
+              {searchQuery && (
+                <button
+                  onClick={() => setSearchQuery('')}
+                  className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded-lg text-xs font-semibold"
+                >
+                  Clear Search Filter
+                </button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
@@ -302,10 +325,10 @@ export default function AdminPage() {
                           <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-white ${
                             u.role === 'ADMIN' ? 'bg-purple-600' : 'bg-emerald-600'
                           }`}>
-                            {u.profile?.name ? u.profile.name.charAt(0).toUpperCase() : 'U'}
+                            {u.profile?.name ? u.profile.name.charAt(0).toUpperCase() : u.email ? u.email.charAt(0).toUpperCase() : 'U'}
                           </div>
                           <div>
-                            <div className="font-bold text-slate-900">{u.profile?.name || 'Un-named User'}</div>
+                            <div className="font-bold text-slate-900">{u.profile?.name || 'User Account'}</div>
                             {u.profile?.age && <div className="text-[10px] text-slate-400">Age: {u.profile.age}</div>}
                           </div>
                         </div>

@@ -8,18 +8,9 @@ const { prisma } = require('../utils/db');
 const getAllUsers = async (req, res) => {
   try {
     const users = await prisma.user.findMany({
-      select: {
-        id: true,
-        email: true,
-        role: true,
-        createdAt: true,
+      include: {
         profile: true,
-        assessment: {
-          select: {
-            isCompleted: true,
-            createdAt: true
-          }
-        },
+        assessment: true,
         _count: {
           select: {
             userTasks: true
@@ -82,7 +73,7 @@ const deleteUser = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `User account ${targetUser.email} and all associated history deleted successfully. You can now re-register with this email.`
+      message: `User account ${targetUser.email} and all associated history deleted successfully.`
     });
 
   } catch (err) {
