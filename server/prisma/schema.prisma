@@ -1,0 +1,164 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum Priority {
+  HIGH
+  MEDIUM
+  LOW
+}
+
+enum PillarType {
+  DOCUMENTS
+  BASIC_NEEDS
+  SKILLS
+  EMPLOYMENT
+  COMMUNITY
+}
+
+model User {
+  id           String      @id @default(uuid())
+  email        String      @unique
+  passwordHash String
+  role         Role        @default(USER)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+
+  profile      Profile?
+  assessment   Assessment?
+  userTasks    UserTask[]
+
+  @@map("users")
+}
+
+model Profile {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  age       Int?
+  location  String?
+  city      String?
+  state     String?
+  bio       String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("profiles")
+}
+
+model Assessment {
+  id          String   @id @default(uuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  situation   String
+  needs       String[] // Array of need identifiers (e.g., ["ID_DOCS", "HOUSING"])
+  goals       String[] // Array of goal identifiers (e.g., ["FIND_JOB", "TRAINING"])
+  location    String?
+  city        String?
+  state       String?
+  isCompleted Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("assessments")
+}
+
+model Pillar {
+  id            String         @id @default(uuid())
+  name          String
+  slug          PillarType     @unique
+  description   String
+  icon          String?
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+
+  taskTemplates TaskTemplate[]
+  userTasks     UserTask[]
+  resources     Resource[]
+
+  @@map("pillars")
+}
+
+model TaskTemplate {
+  id                   String     @id @default(uuid())
+  pillarId             String
+  pillar               Pillar     @relation(fields: [pillarId], references: [id], onDelete: Cascade)
+  title                String
+  description          String
+  priority             Priority   @default(MEDIUM)
+  triggerNeed          String?    // Need keyword that triggers this task (e.g. "ID_DOCS")
+  triggerGoal          String?    // Goal keyword that triggers this task
+  defaultDaysToComplete Int       @default(7)
+  createdAt            DateTime   @default(now())
+  updatedAt            DateTime   @updatedAt
+
+  userTasks            UserTask[]
+
+  @@map("task_templates")
+}
+
+model UserTask {
+  id             String        @id @default(uuid())
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pillarId       String
+  pillar         Pillar        @relation(fields: [pillarId], references: [id], onDelete: Cascade)
+  taskTemplateId String?
+  taskTemplate   TaskTemplate? @relation(fields: [taskTemplateId], references: [id], onDelete: SetNull)
+  title          String
+  description    String
+  priority       Priority      @default(MEDIUM)
+  isCompleted    Boolean       @default(false)
+  completedAt    DateTime?
+  dueDate        DateTime?
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  @@map("user_tasks")
+}
+
+model ResourceCategory {
+  id          String     @id @default(uuid())
+  name        String
+  slug        String     @unique
+  description String?
+  resources   Resource[]
+
+  @@map("resource_categories")
+}
+
+model Resource {
+  id              String           @id @default(uuid())
+  name            String
+  description     String
+  organization    String
+  pillarId        String
+  pillar          Pillar           @relation(fields: [pillarId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        ResourceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  address         String?
+  city            String
+  state           String
+  contactInfo     String?
+  website         String?
+  isLocationBased Boolean          @default(true)
+  isActive        Boolean          @default(true)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  @@index([city, state])
+  @@index([pillarId])
+  @@index([categoryId])
+  @@map("resources")
+}

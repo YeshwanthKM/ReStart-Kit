@@ -1,0 +1,17 @@
+{
+  "name": "restart-kit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "ReStart Kit – A Guided Path to a Fresh Start",
+  "scripts": {
+    "dev:server": "npm --prefix server run dev",
+    "dev:client": "npm --prefix client run dev",
+    "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
+    "build:client": "npm --prefix client run build",
+    "prisma:generate": "npm --prefix server run prisma:generate",
+    "prisma:studio": "npm --prefix server run prisma:studio"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
