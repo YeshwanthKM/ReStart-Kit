@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { getAllUsers, getAdminStats } = require('../controllers/admin.controller');
+const { getAllUsers, getAdminStats, getTaskTemplates } = require('../controllers/admin.controller');
 const { authenticateToken, requireRole } = require('../middleware/auth.middleware');
 
 // All admin routes require JWT token AND ADMIN role
@@ -9,5 +9,6 @@ router.use(requireRole('ADMIN'));
 
 router.get('/users', getAllUsers);
 router.get('/stats', getAdminStats);
+router.get('/task-templates', getTaskTemplates);
 
 module.exports = router;

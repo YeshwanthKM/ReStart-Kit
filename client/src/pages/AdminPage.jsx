@@ -13,26 +13,29 @@ import {
   Building,
   MapPin,
   Calendar,
-  Sparkles
+  Sparkles,
+  ListFilter
 } from 'lucide-react';
 
 export default function AdminPage() {
   const [stats, setStats] = useState(null);
   const [users, setUsers] = useState([]);
+  const [templates, setTemplates] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   // Active Tab & Search
-  const [activeTab, setActiveTab] = useState('users');
+  const [activeTab, setActiveTab] = useState('users'); // 'users' | 'templates'
   const [searchQuery, setSearchQuery] = useState('');
 
   const fetchAdminData = async () => {
     setLoading(true);
     setError(null);
     try {
-      const [statsRes, usersRes] = await Promise.all([
+      const [statsRes, usersRes, templatesRes] = await Promise.all([
         api.get('/admin/stats'),
-        api.get('/admin/users')
+        api.get('/admin/users'),
+        api.get('/admin/task-templates')
       ]);
 
       if (statsRes.data.success) {
@@ -40,6 +43,9 @@ export default function AdminPage() {
       }
       if (usersRes.data.success) {
         setUsers(usersRes.data.users || []);
+      }
+      if (templatesRes.data.success) {
+        setTemplates(templatesRes.data.templates || []);
       }
     } catch (err) {
       console.error('Admin portal data fetch error:', err);
@@ -61,6 +67,27 @@ export default function AdminPage() {
     return name.includes(query) || email.includes(query) || city.includes(query);
   });
 
+  const filteredTemplates = templates.filter(t => {
+    const query = searchQuery.toLowerCase();
+    const title = t.title.toLowerCase();
+    const desc = t.description.toLowerCase();
+    const pillarName = t.pillar?.name ? t.pillar.name.toLowerCase() : '';
+    return title.includes(query) || desc.includes(query) || pillarName.includes(query);
+  });
+
+  const getPriorityStyle = (priority) => {
+    switch (priority) {
+      case 'HIGH':
+        return 'bg-rose-100 text-rose-800 border-rose-200';
+      case 'MEDIUM':
+        return 'bg-amber-100 text-amber-800 border-amber-200';
+      case 'LOW':
+        return 'bg-blue-100 text-blue-800 border-blue-200';
+      default:
+        return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
+  };
+
   return (
     <div className="max-w-6xl mx-auto my-8 space-y-6">
       
@@ -72,9 +99,9 @@ export default function AdminPage() {
               <ShieldCheck className="w-4 h-4 text-purple-300" />
               <span>Platform Administration Portal</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">System Oversight & User Management</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">System Oversight & Rule Management</h2>
             <p className="text-purple-200 text-sm leading-relaxed">
-              Manage registered user accounts, oversee assessment activity, and inspect platform task templates.
+              Manage registered user accounts, oversee assessment activity, and inspect pre-seeded task recommendation templates.
             </p>
           </div>
 
@@ -172,6 +199,18 @@ export default function AdminPage() {
               <Users className="w-3.5 h-3.5" />
               <span>Registered Users ({users.length})</span>
             </button>
+
+            <button
+              onClick={() => setActiveTab('templates')}
+              className={`px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center space-x-2 ${
+                activeTab === 'templates'
+                  ? 'bg-purple-700 text-white shadow-sm'
+                  : 'bg-white text-slate-700 hover:bg-slate-100 border border-slate-200'
+              }`}
+            >
+              <ListFilter className="w-3.5 h-3.5" />
+              <span>Task Templates ({templates.length})</span>
+            </button>
           </div>
 
           {/* Search Box */}
@@ -181,108 +220,190 @@ export default function AdminPage() {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by name, email, city..."
+              placeholder={activeTab === 'users' ? 'Search by name, email, city...' : 'Search template title, pillar...'}
               className="w-full pl-9 pr-3 py-1.5 bg-white border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500"
             />
           </div>
         </div>
 
-        {/* Users Directory Table */}
-        {loading ? (
-          <div className="p-12 text-center text-slate-500 flex flex-col items-center justify-center space-y-2">
-            <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
-            <span className="text-xs font-medium">Fetching registered user directory...</span>
-          </div>
-        ) : filteredUsers.length === 0 ? (
-          <div className="p-10 text-center text-slate-500 text-xs">
-            No registered users found matching your search.
-          </div>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse text-xs">
-              <thead>
-                <tr className="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
-                  <th className="py-3 px-4">User / Name</th>
-                  <th className="py-3 px-4">Email Address</th>
-                  <th className="py-3 px-4">Role</th>
-                  <th className="py-3 px-4">Location / City</th>
-                  <th className="py-3 px-4">Assessment</th>
-                  <th className="py-3 px-4">Generated Tasks</th>
-                  <th className="py-3 px-4">Joined Date</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-200">
-                {filteredUsers.map((u) => (
-                  <tr key={u.id} className="hover:bg-slate-50 transition-colors">
-                    
-                    {/* Name */}
-                    <td className="py-3.5 px-4">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-white ${
-                          u.role === 'ADMIN' ? 'bg-purple-600' : 'bg-emerald-600'
-                        }`}>
-                          {u.profile?.name ? u.profile.name.charAt(0).toUpperCase() : 'U'}
-                        </div>
-                        <div>
-                          <div className="font-bold text-slate-900">{u.profile?.name || 'Un-named User'}</div>
-                          {u.profile?.age && <div className="text-[10px] text-slate-400">Age: {u.profile.age}</div>}
-                        </div>
-                      </div>
-                    </td>
-
-                    {/* Email */}
-                    <td className="py-3.5 px-4 font-medium text-slate-700">{u.email}</td>
-
-                    {/* Role */}
-                    <td className="py-3.5 px-4">
-                      <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider ${
-                        u.role === 'ADMIN'
-                          ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                          : 'bg-blue-100 text-blue-800 border border-blue-200'
-                      }`}>
-                        {u.role}
-                      </span>
-                    </td>
-
-                    {/* Location */}
-                    <td className="py-3.5 px-4 text-slate-600">
-                      {u.profile?.city || u.profile?.state ? (
-                        <div className="flex items-center space-x-1">
-                          <MapPin className="w-3 h-3 text-slate-400" />
-                          <span>{u.profile.city || ''}{u.profile.city && u.profile.state ? ', ' : ''}{u.profile.state || ''}</span>
-                        </div>
-                      ) : (
-                        <span className="text-slate-400 italic">Not set</span>
-                      )}
-                    </td>
-
-                    {/* Assessment */}
-                    <td className="py-3.5 px-4">
-                      {u.assessment?.isCompleted ? (
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold text-[10px] border border-emerald-200">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                          <span>Completed</span>
-                        </span>
-                      ) : (
-                        <span className="text-slate-400 text-[11px] italic">Pending</span>
-                      )}
-                    </td>
-
-                    {/* Tasks */}
-                    <td className="py-3.5 px-4 font-semibold text-slate-700">
-                      {u._count?.userTasks || 0} task(s)
-                    </td>
-
-                    {/* Joined Date */}
-                    <td className="py-3.5 px-4 text-slate-500 text-[11px]">
-                      {new Date(u.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </td>
-
+        {/* TAB 1: Registered Users Directory Table */}
+        {activeTab === 'users' && (
+          loading ? (
+            <div className="p-12 text-center text-slate-500 flex flex-col items-center justify-center space-y-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
+              <span className="text-xs font-medium">Fetching registered user directory...</span>
+            </div>
+          ) : filteredUsers.length === 0 ? (
+            <div className="p-10 text-center text-slate-500 text-xs">
+              No registered users found matching your search.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4">User / Name</th>
+                    <th className="py-3 px-4">Email Address</th>
+                    <th className="py-3 px-4">Role</th>
+                    <th className="py-3 px-4">Location / City</th>
+                    <th className="py-3 px-4">Assessment</th>
+                    <th className="py-3 px-4">Generated Tasks</th>
+                    <th className="py-3 px-4">Joined Date</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {filteredUsers.map((u) => (
+                    <tr key={u.id} className="hover:bg-slate-50 transition-colors">
+                      
+                      {/* Name */}
+                      <td className="py-3.5 px-4">
+                        <div className="flex items-center space-x-3">
+                          <div className={`w-8 h-8 rounded-full font-bold flex items-center justify-center text-white ${
+                            u.role === 'ADMIN' ? 'bg-purple-600' : 'bg-emerald-600'
+                          }`}>
+                            {u.profile?.name ? u.profile.name.charAt(0).toUpperCase() : 'U'}
+                          </div>
+                          <div>
+                            <div className="font-bold text-slate-900">{u.profile?.name || 'Un-named User'}</div>
+                            {u.profile?.age && <div className="text-[10px] text-slate-400">Age: {u.profile.age}</div>}
+                          </div>
+                        </div>
+                      </td>
+
+                      {/* Email */}
+                      <td className="py-3.5 px-4 font-medium text-slate-700">{u.email}</td>
+
+                      {/* Role */}
+                      <td className="py-3.5 px-4">
+                        <span className={`px-2 py-0.5 rounded-full font-bold text-[10px] uppercase tracking-wider ${
+                          u.role === 'ADMIN'
+                            ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                            : 'bg-blue-100 text-blue-800 border border-blue-200'
+                        }`}>
+                          {u.role}
+                        </span>
+                      </td>
+
+                      {/* Location */}
+                      <td className="py-3.5 px-4 text-slate-600">
+                        {u.profile?.city || u.profile?.state ? (
+                          <div className="flex items-center space-x-1">
+                            <MapPin className="w-3 h-3 text-slate-400" />
+                            <span>{u.profile.city || ''}{u.profile.city && u.profile.state ? ', ' : ''}{u.profile.state || ''}</span>
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic">Not set</span>
+                        )}
+                      </td>
+
+                      {/* Assessment */}
+                      <td className="py-3.5 px-4">
+                        {u.assessment?.isCompleted ? (
+                          <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-semibold text-[10px] border border-emerald-200">
+                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                            <span>Completed</span>
+                          </span>
+                        ) : (
+                          <span className="text-slate-400 text-[11px] italic">Pending</span>
+                        )}
+                      </td>
+
+                      {/* Tasks */}
+                      <td className="py-3.5 px-4 font-semibold text-slate-700">
+                        {u._count?.userTasks || 0} task(s)
+                      </td>
+
+                      {/* Joined Date */}
+                      <td className="py-3.5 px-4 text-slate-500 text-[11px]">
+                        {new Date(u.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
+        )}
+
+        {/* TAB 2: Task Templates Inspection Table */}
+        {activeTab === 'templates' && (
+          loading ? (
+            <div className="p-12 text-center text-slate-500 flex flex-col items-center justify-center space-y-2">
+              <RefreshCw className="w-6 h-6 animate-spin text-purple-600" />
+              <span className="text-xs font-medium">Fetching rule templates...</span>
+            </div>
+          ) : filteredTemplates.length === 0 ? (
+            <div className="p-10 text-center text-slate-500 text-xs">
+              No task templates found matching your search query.
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr className="bg-slate-100/80 text-slate-600 font-bold uppercase tracking-wider border-b border-slate-200">
+                    <th className="py-3 px-4">Pillar</th>
+                    <th className="py-3 px-4">Template Title & Description</th>
+                    <th className="py-3 px-4">Priority</th>
+                    <th className="py-3 px-4">Trigger Need / Goal</th>
+                    <th className="py-3 px-4">Target Timeline</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-200">
+                  {filteredTemplates.map((t) => (
+                    <tr key={t.id} className="hover:bg-slate-50 transition-colors">
+                      
+                      {/* Pillar */}
+                      <td className="py-3.5 px-4 font-bold text-slate-800">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px]">
+                          {t.pillar?.name || 'General'}
+                        </span>
+                      </td>
+
+                      {/* Title & Description */}
+                      <td className="py-3.5 px-4 space-y-1">
+                        <div className="font-bold text-slate-900">{t.title}</div>
+                        <div className="text-slate-600 text-[11px] leading-relaxed max-w-md">{t.description}</div>
+                      </td>
+
+                      {/* Priority */}
+                      <td className="py-3.5 px-4">
+                        <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] uppercase tracking-wider border ${getPriorityStyle(t.priority)}`}>
+                          {t.priority}
+                        </span>
+                      </td>
+
+                      {/* Trigger Condition */}
+                      <td className="py-3.5 px-4">
+                        {t.triggerNeed || t.triggerGoal ? (
+                          <div className="space-y-0.5">
+                            {t.triggerNeed && (
+                              <span className="inline-block px-1.5 py-0.5 rounded bg-purple-50 text-purple-800 border border-purple-200 text-[10px] font-mono">
+                                Need: {t.triggerNeed}
+                              </span>
+                            )}
+                            {t.triggerGoal && (
+                              <span className="inline-block px-1.5 py-0.5 rounded bg-blue-50 text-blue-800 border border-blue-200 text-[10px] font-mono">
+                                Goal: {t.triggerGoal}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-400 italic text-[11px]">Universal</span>
+                        )}
+                      </td>
+
+                      {/* Target Timeline */}
+                      <td className="py-3.5 px-4 font-semibold text-slate-700">
+                        {t.defaultDaysToComplete || 7} Days
+                      </td>
+
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )
         )}
 
       </div>

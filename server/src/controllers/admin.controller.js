@@ -86,7 +86,40 @@ const getAdminStats = async (req, res) => {
   }
 };
 
+/**
+ * Get all pre-seeded task templates for Admin rule inspection
+ * @route GET /api/admin/task-templates
+ * @access Protected (ADMIN only)
+ */
+const getTaskTemplates = async (req, res) => {
+  try {
+    const templates = await prisma.taskTemplate.findMany({
+      include: {
+        pillar: true
+      },
+      orderBy: [
+        { pillarId: 'asc' },
+        { priority: 'asc' }
+      ]
+    });
+
+    return res.status(200).json({
+      success: true,
+      count: templates.length,
+      templates
+    });
+  } catch (err) {
+    console.error('Get Task Templates Error:', err);
+    return res.status(500).json({
+      success: false,
+      message: 'Server error fetching task templates',
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
+
 module.exports = {
   getAllUsers,
-  getAdminStats
+  getAdminStats,
+  getTaskTemplates
 };
