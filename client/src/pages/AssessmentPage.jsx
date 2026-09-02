@@ -14,8 +14,7 @@ import {
   ArrowLeft, 
   CheckCircle2, 
   AlertCircle,
-  Sparkles,
-  ShieldCheck
+  Sparkles
 } from 'lucide-react';
 
 export default function AssessmentPage({ onComplete }) {
@@ -203,13 +202,22 @@ export default function AssessmentPage({ onComplete }) {
       });
 
       if (res.data.success) {
-        setSuccessMsg('Assessment saved successfully!');
-        if (onComplete) onComplete(res.data.assessment);
+        setSuccessMsg('Assessment saved! Auto-generating your ReStart Kit...');
+        // Auto-generate task checklist based on assessment
+        try {
+          await api.post('/tasks/generate');
+        } catch (genErr) {
+          console.error('Auto-generate tasks non-fatal error:', genErr);
+        }
+        
+        // Short delay to show success state before transitioning
+        setTimeout(() => {
+          if (onComplete) onComplete(res.data.assessment);
+        }, 800);
       }
     } catch (err) {
       console.error('Submit Assessment Error:', err);
       setError(err.message || 'Failed to save assessment. Please try again.');
-    } finally {
       setLoading(false);
     }
   };
@@ -491,7 +499,7 @@ export default function AssessmentPage({ onComplete }) {
               className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
-              <span>{loading ? 'Saving Assessment...' : 'Complete Assessment'}</span>
+              <span>{loading ? 'Building Roadmap...' : 'Complete Assessment'}</span>
             </button>
           )}
         </div>

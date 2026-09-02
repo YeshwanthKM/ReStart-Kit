@@ -30,7 +30,7 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
   const [selectedPillar, setSelectedPillar] = useState('ALL');
   const [selectedStatus, setSelectedStatus] = useState('ALL');
 
-  const fetchTasks = async () => {
+  const fetchTasks = async (autoGenIfEmpty = false) => {
     setLoading(true);
     setError(null);
     try {
@@ -45,8 +45,16 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
 
       const res = await api.get(url);
       if (res.data.success) {
-        setTasks(res.data.tasks || []);
-        setStats(res.data.stats || { total: 0, completed: 0, pending: 0, progressPercent: 0 });
+        const fetchedTasks = res.data.tasks || [];
+        const fetchedStats = res.data.stats || { total: 0, completed: 0, pending: 0, progressPercent: 0 };
+        
+        setTasks(fetchedTasks);
+        setStats(fetchedStats);
+
+        // Auto-trigger generation if no tasks exist yet and autoGenIfEmpty is true
+        if (autoGenIfEmpty && fetchedStats.total === 0) {
+          handleGenerateTasks(true);
+        }
       }
     } catch (err) {
       console.error('Fetch tasks error:', err);
@@ -57,28 +65,40 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
   };
 
   useEffect(() => {
-    fetchTasks();
+    fetchTasks(true);
   }, [selectedPillar, selectedStatus]);
 
-  const handleGenerateTasks = async () => {
+  const handleGenerateTasks = async (isAuto = false) => {
     setGenLoading(true);
-    setError(null);
-    setSuccessMsg(null);
+    if (!isAuto) {
+      setError(null);
+      setSuccessMsg(null);
+    }
     try {
       const res = await api.post('/tasks/generate');
       if (res.data.success) {
-        setSuccessMsg(res.data.message || 'ReStart Kit generated successfully!');
-        fetchTasks();
+        if (!isAuto) {
+          setSuccessMsg(res.data.message || 'ReStart Kit generated successfully!');
+        }
+        // Refetch after generation
+        const refetchRes = await api.get('/tasks');
+        if (refetchRes.data.success) {
+          setTasks(refetchRes.data.tasks || []);
+          setStats(refetchRes.data.stats || { total: 0, completed: 0, pending: 0, progressPercent: 0 });
+        }
       }
     } catch (err) {
       console.error('Generate tasks error:', err);
-      if (err.response && err.response.data && err.response.data.message) {
-        setError(err.response.data.message);
-      } else {
-        setError('Please complete your Needs & Goals Assessment first.');
+      if (!isAuto) {
+        if (err.response && err.response.data && err.response.data.message) {
+          setError(err.response.data.message);
+        } else {
+          setError('Please complete your Needs & Goals Assessment first.');
+        }
       }
     } finally {
       setGenLoading(false);
+      setLoading(false);
     }
   };
 
@@ -99,13 +119,11 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
     try {
       const res = await api.patch(`/tasks/${taskId}/toggle`);
       if (res.data.success) {
-        // Refetch stats silently
-        fetchTasks();
+        fetchTasks(false);
       }
     } catch (err) {
       console.error('Toggle task error:', err);
-      // Revert optimistic update on failure
-      fetchTasks();
+      fetchTasks(false);
     }
   };
 
@@ -257,7 +275,7 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
 
             {/* Re-generate Roadmap Button */}
             <button
-              onClick={handleGenerateTasks}
+              onClick={() => handleGenerateTasks(false)}
               disabled={genLoading}
               className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center space-x-1.5 disabled:opacity-50"
               title="Refresh / Auto-Generate Tasks from Assessment"
@@ -271,10 +289,10 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
       </div>
 
       {/* Task Checklist Items List */}
-      {loading ? (
+      {loading || genLoading ? (
         <div className="p-12 bg-white rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-slate-500 space-y-3">
           <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-          <span className="text-sm font-medium">Loading your ReStart Kit checklist...</span>
+          <span className="text-sm font-medium">Generating your ReStart Kit roadmap...</span>
         </div>
       ) : tasks.length === 0 ? (
         <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-4">
@@ -284,19 +302,18 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
           <h3 className="text-lg font-bold text-slate-900">No Tasks Found</h3>
           <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
             {stats.total === 0
-              ? 'You haven’t generated your ReStart Kit roadmap yet! Click below to generate your personalized step-by-step checklist based on your assessment.'
+              ? 'Please complete your Needs & Goals Assessment to auto-generate your step-by-step fresh start roadmap.'
               : 'No tasks match your selected filter options.'}
           </p>
 
           <div className="pt-2 flex justify-center space-x-3">
             {stats.total === 0 ? (
               <button
-                onClick={handleGenerateTasks}
-                disabled={genLoading}
+                onClick={onNavigateToAssessment}
                 className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
               >
-                <Sparkles className="w-4 h-4" />
-                <span>Generate My ReStart Kit</span>
+                <span>Take Assessment Now</span>
+                <ArrowRight className="w-4 h-4" />
               </button>
             ) : (
               <button
