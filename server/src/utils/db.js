@@ -10,19 +10,32 @@ let prisma;
 if (process.env.VERCEL) {
   const dbDir = '/tmp';
   const dbPath = path.join(dbDir, 'dev.db');
-  const sourceDbPath = path.join(process.cwd(), 'prisma', 'dev.db');
+
+  const candidateSourcePaths = [
+    path.join(__dirname, '..', '..', 'prisma', 'dev.db'),
+    path.join(process.cwd(), 'server', 'prisma', 'dev.db'),
+    path.join(process.cwd(), 'prisma', 'dev.db')
+  ];
 
   if (!fs.existsSync(dbPath)) {
-    console.log('📦 Vercel detected: Copying SQLite database to /tmp/dev.db...');
-    try {
-      if (fs.existsSync(sourceDbPath)) {
-        fs.copyFileSync(sourceDbPath, dbPath);
-        console.log('✅ SQLite DB successfully copied to /tmp/dev.db');
-      } else {
-        console.log('⚠️ Source db not found at', sourceDbPath);
+    console.log('📦 Vercel detected: Locating source SQLite database...');
+    let copied = false;
+
+    for (const sourcePath of candidateSourcePaths) {
+      if (fs.existsSync(sourcePath)) {
+        try {
+          fs.copyFileSync(sourcePath, dbPath);
+          console.log(`✅ SQLite DB successfully copied from ${sourcePath} to ${dbPath}`);
+          copied = true;
+          break;
+        } catch (e) {
+          console.error(`❌ Failed to copy SQLite DB from ${sourcePath}:`, e);
+        }
       }
-    } catch (e) {
-      console.error('❌ Failed to copy SQLite DB to /tmp:', e);
+    }
+
+    if (!copied) {
+      console.warn('⚠️ Could not find pre-built dev.db source file on Vercel.');
     }
   }
 
@@ -131,8 +144,8 @@ const seedInitialUsers = async () => {
   }
 };
 
-// Trigger auto-seeding
-seedInitialUsers();
+// Trigger auto-seeding safely
+seedInitialUsers().catch(err => console.error("Initial seeding error:", err));
 
 module.exports = {
   prisma,
