@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   FileText, 
   Home, 
@@ -24,6 +25,7 @@ import {
 
 export default function DashboardPage({ onNavigate }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [dashboardData, setDashboardData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -126,13 +128,13 @@ export default function DashboardPage({ onNavigate }) {
           <div className="space-y-2 max-w-xl">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-emerald-700/80 backdrop-blur-sm text-emerald-100 rounded-full text-xs font-semibold border border-emerald-500/40">
               <Compass className="w-3.5 h-3.5" />
-              <span>Personal Reintegration Dashboard</span>
+              <span>{t('dash_title')}</span>
             </span>
             <h2 className="text-2xl sm:text-4xl font-extrabold tracking-tight">
-              Welcome, {profileName}!
+              {t('hero_welcome')}, {profileName}!
             </h2>
             <p className="text-emerald-100 text-sm leading-relaxed">
-              Track your step-by-step progress across the 5 Reintegration Pillars and execute your top recommended next steps.
+              {t('dash_subtitle')}
             </p>
             {cityState && (
               <div className="flex items-center space-x-1 text-xs text-emerald-200 pt-1 font-medium">
@@ -145,7 +147,7 @@ export default function DashboardPage({ onNavigate }) {
           {/* Overall Progress Widget Box */}
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-6 text-center min-w-[220px] flex flex-col items-center justify-center">
             <div className="text-4xl font-black text-white">{stats.overallProgressPercent}%</div>
-            <div className="text-xs font-bold text-emerald-200 mt-1 uppercase tracking-wider">Overall Progress</div>
+            <div className="text-xs font-bold text-emerald-200 mt-1 uppercase tracking-wider">{t('dash_overall_progress')}</div>
             <div className="w-full bg-emerald-950/60 rounded-full h-2.5 mt-3 overflow-hidden border border-emerald-500/30">
               <div 
                 className="bg-emerald-400 h-2.5 rounded-full transition-all duration-500" 
@@ -153,7 +155,7 @@ export default function DashboardPage({ onNavigate }) {
               ></div>
             </div>
             <div className="flex items-center justify-between w-full text-xs text-emerald-200 mt-3 font-semibold">
-              <span>{stats.completedTasks} Completed</span>
+              <span>{stats.completedTasks} Done</span>
               <span>{stats.pendingTasks} Pending</span>
             </div>
           </div>
@@ -180,9 +182,9 @@ export default function DashboardPage({ onNavigate }) {
               <div>
                 <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
                   <Sparkles className="w-5 h-5 text-emerald-600" />
-                  <span>Recommended Next Steps</span>
+                  <span>{t('dash_recommended_title')}</span>
                 </h3>
-                <p className="text-xs text-slate-500 mt-0.5">Top priority action items for your immediate focus.</p>
+                <p className="text-xs text-slate-500 mt-0.5">{t('dash_recommended_subtitle')}</p>
               </div>
 
               {onNavigate && (
@@ -190,7 +192,7 @@ export default function DashboardPage({ onNavigate }) {
                   onClick={() => onNavigate('roadmap')}
                   className="text-xs font-semibold text-emerald-600 hover:text-emerald-700 flex items-center space-x-1"
                 >
-                  <span>View All Roadmap</span>
+                  <span>{t('dash_view_full_roadmap')}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               )}
@@ -198,52 +200,53 @@ export default function DashboardPage({ onNavigate }) {
 
             {recommendedNextSteps.length === 0 ? (
               <div className="p-6 bg-slate-50 rounded-xl text-center text-slate-500 text-xs space-y-3">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
-                <p className="font-semibold text-slate-700">
-                  {stats.totalTasks > 0 ? 'All pending tasks completed! Great job!' : 'No tasks generated yet.'}
-                </p>
-                {stats.totalTasks === 0 && onNavigate && (
+                <p>{t('roadmap_empty')}</p>
+                {onNavigate && (
                   <button
                     onClick={() => onNavigate('assessment')}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm"
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold rounded-lg text-xs transition-colors"
                   >
-                    Take Needs Assessment Now
+                    {t('hero_btn_assessment')}
                   </button>
                 )}
               </div>
             ) : (
               <div className="space-y-3">
                 {recommendedNextSteps.map((task) => {
-                  const Icon = getPillarIcon(task.pillar?.slug);
+                  const pillarColor = getPillarColor(task.pillar?.slug);
                   return (
                     <div 
                       key={task.id}
-                      className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 hover:bg-white hover:border-emerald-300 transition-all flex items-start space-x-3"
+                      className={`p-4 rounded-xl border transition-all flex items-start space-x-3 ${
+                        task.isCompleted ? 'bg-slate-50 border-slate-200 opacity-75' : 'bg-white border-slate-200 shadow-sm hover:border-emerald-300'
+                      }`}
                     >
                       <button
                         onClick={() => handleToggleTask(task.id)}
-                        className="mt-0.5 text-slate-400 hover:text-emerald-600 transition-colors focus:outline-none flex-shrink-0"
+                        className="mt-0.5 focus:outline-none flex-shrink-0"
                       >
                         {task.isCompleted ? (
-                          <CheckSquare className="w-5 h-5 text-emerald-600 fill-emerald-100" />
+                          <CheckSquare className="w-5 h-5 text-emerald-600" />
                         ) : (
-                          <Square className="w-5 h-5 text-slate-400 hover:text-slate-600" />
+                          <Square className="w-5 h-5 text-slate-400 hover:text-emerald-600" />
                         )}
                       </button>
 
-                      <div className="flex-grow space-y-1">
-                        <div className="flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-slate-600 flex items-center space-x-1">
-                            <Icon className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>{task.pillar?.name}</span>
+                      <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between gap-2">
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${pillarColor.bg} ${pillarColor.text}`}>
+                            {task.pillar?.name}
                           </span>
-                          <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-rose-100 text-rose-800 border border-rose-200">
-                            {task.priority} Priority
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                            task.priority === 'HIGH' ? 'bg-rose-100 text-rose-800' : 'bg-amber-100 text-amber-800'
+                          }`}>
+                            {task.priority}
                           </span>
                         </div>
-
-                        <h4 className="text-sm font-bold text-slate-900">{task.title}</h4>
-                        <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed">{task.description}</p>
+                        <h4 className={`text-sm font-bold ${task.isCompleted ? 'line-through text-slate-500' : 'text-slate-900'}`}>
+                          {task.title}
+                        </h4>
+                        <p className="text-xs text-slate-600 leading-relaxed">{task.description}</p>
                       </div>
                     </div>
                   );
@@ -252,39 +255,36 @@ export default function DashboardPage({ onNavigate }) {
             )}
           </div>
 
-          {/* 5 Reintegration Pillars Progress Breakdown Cards */}
-          <div className="space-y-4">
-            <div>
-              <h3 className="text-lg font-bold text-slate-900">5 Reintegration Pillars Progress</h3>
-              <p className="text-xs text-slate-500 mt-0.5">Completion breakdown across all core reintegration areas.</p>
-            </div>
+          {/* 5-Pillar Progress Breakdown */}
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+            <h3 className="text-lg font-bold text-slate-900 flex items-center space-x-2">
+              <Layers className="w-5 h-5 text-emerald-600" />
+              <span>{t('dash_pillar_breakdown')}</span>
+            </h3>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {pillarBreakdown.map((pillar) => {
-                const Icon = getPillarIcon(pillar.slug);
-                const colors = getPillarColor(pillar.slug);
+            <div className="space-y-4">
+              {pillarBreakdown.map((item) => {
+                const Icon = getPillarIcon(item.pillar.slug);
+                const color = getPillarColor(item.pillar.slug);
                 return (
-                  <div key={pillar.id} className="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm space-y-3">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center space-x-3">
-                        <div className={`w-10 h-10 rounded-xl ${colors.bg} flex items-center justify-center`}>
-                          <Icon className={`w-5 h-5 ${colors.text}`} />
+                  <div key={item.pillar.id} className="space-y-2 p-3 bg-slate-50/70 rounded-xl border border-slate-100">
+                    <div className="flex items-center justify-between text-xs font-bold">
+                      <div className="flex items-center space-x-2">
+                        <div className={`p-1.5 rounded-lg ${color.bg} ${color.text}`}>
+                          <Icon className="w-4 h-4" />
                         </div>
-                        <div>
-                          <h4 className="text-sm font-bold text-slate-900">{pillar.name}</h4>
-                          <span className="text-[11px] text-slate-500 font-medium">
-                            {pillar.completedTasks} / {pillar.totalTasks} Tasks Done
-                          </span>
-                        </div>
+                        <span className="text-slate-900">{item.pillar.name}</span>
                       </div>
-
-                      <span className="text-sm font-black text-slate-900">{pillar.progressPercent}%</span>
+                      <div className="flex items-center space-x-2 text-slate-600">
+                        <span>{item.completedTasks}/{item.totalTasks} {t('dash_tasks_done')}</span>
+                        <span className="font-black text-slate-900">{item.progressPercent}%</span>
+                      </div>
                     </div>
 
-                    <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                       <div 
-                        className={`h-2 rounded-full transition-all duration-300 ${colors.bar}`}
-                        style={{ width: `${pillar.progressPercent}%` }}
+                        className={`h-2 rounded-full transition-all duration-500 ${color.bar}`} 
+                        style={{ width: `${item.progressPercent}%` }}
                       ></div>
                     </div>
                   </div>
@@ -295,69 +295,50 @@ export default function DashboardPage({ onNavigate }) {
 
         </div>
 
-        {/* RIGHT 1 COLUMN: Quick Actions & Profile Summary */}
+        {/* RIGHT COLUMN: Quick Action Shortcuts */}
         <div className="space-y-6">
-          
-          {/* Quick Action Shortcuts Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-4">
-            <h3 className="text-base font-bold text-slate-900">Quick Actions</h3>
+          <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
+            <h3 className="text-base font-bold text-slate-900">Quick Navigation Shortcuts</h3>
 
             <div className="space-y-2.5">
-              <button
-                onClick={() => onNavigate && onNavigate('roadmap')}
-                className="w-full p-3.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-950 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-2.5">
-                  <Layers className="w-4 h-4 text-emerald-600" />
-                  <span>View Full ReStart Roadmap</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-emerald-700" />
-              </button>
+              {onNavigate && (
+                <>
+                  <button
+                    onClick={() => onNavigate('roadmap')}
+                    className="w-full p-3 bg-emerald-50 hover:bg-emerald-100/80 border border-emerald-200 rounded-xl text-emerald-900 font-bold text-xs flex items-center justify-between transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Layers className="w-4 h-4 text-emerald-600" />
+                      <span>{t('nav_roadmap')}</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-emerald-600" />
+                  </button>
 
-              <button
-                onClick={() => onNavigate && onNavigate('assessment')}
-                className="w-full p-3.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold text-xs rounded-xl border border-slate-200 transition-colors flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-2.5">
-                  <ClipboardCheck className="w-4 h-4 text-slate-600" />
-                  <span>Update Needs Assessment</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
+                  <button
+                    onClick={() => onNavigate('resources')}
+                    className="w-full p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs flex items-center justify-between transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <Compass className="w-4 h-4 text-emerald-600" />
+                      <span>{t('nav_resources')}</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400" />
+                  </button>
 
-              <button
-                onClick={() => onNavigate && onNavigate('profile')}
-                className="w-full p-3.5 bg-slate-50 hover:bg-slate-100 text-slate-800 font-semibold text-xs rounded-xl border border-slate-200 transition-colors flex items-center justify-between"
-              >
-                <div className="flex items-center space-x-2.5">
-                  <User className="w-4 h-4 text-slate-600" />
-                  <span>Edit Profile & Location</span>
-                </div>
-                <ArrowRight className="w-4 h-4 text-slate-400" />
-              </button>
-            </div>
-          </div>
-
-          {/* User Profile Card */}
-          <div className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm space-y-3">
-            <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 rounded-xl bg-emerald-600 text-white font-bold text-xl flex items-center justify-center shadow-sm">
-                {profileName.charAt(0).toUpperCase()}
-              </div>
-              <div>
-                <h4 className="font-bold text-sm text-slate-900">{profileName}</h4>
-                <p className="text-xs text-slate-500">{user?.email}</p>
-              </div>
-            </div>
-
-            <div className="pt-2 border-t border-slate-100 text-xs text-slate-600 space-y-1">
-              {user?.profile?.city && (
-                <div><span className="font-semibold text-slate-700">Location:</span> {user.profile.city}, {user.profile.state || ''}</div>
+                  <button
+                    onClick={() => onNavigate('assessment')}
+                    className="w-full p-3 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-900 font-bold text-xs flex items-center justify-between transition-colors"
+                  >
+                    <div className="flex items-center space-x-2">
+                      <ClipboardCheck className="w-4 h-4 text-emerald-600" />
+                      <span>{t('roadmap_retake_survey')}</span>
+                    </div>
+                    <ArrowRight className="w-4 h-4 text-slate-400" />
+                  </button>
+                </>
               )}
-              <div><span className="font-semibold text-slate-700">Role:</span> {user?.role}</div>
             </div>
           </div>
-
         </div>
 
       </div>
