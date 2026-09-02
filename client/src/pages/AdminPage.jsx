@@ -75,7 +75,15 @@ export default function AdminPage() {
       const res = await api.delete(`/admin/users/${userId}`);
       if (res.data.success) {
         setSuccessMsg(res.data.message || `User account ${userEmail} deleted successfully.`);
+        
+        // Optimistically update users table AND stats counter together
         setUsers(prev => prev.filter(u => u.id !== userId));
+        setStats(prev => prev ? {
+          ...prev,
+          totalUsers: Math.max(0, prev.totalUsers - 1),
+          totalStandardUsers: Math.max(0, prev.totalStandardUsers - 1)
+        } : prev);
+
         fetchAdminData();
       }
     } catch (err) {
