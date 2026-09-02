@@ -1,5 +1,5 @@
 const bcrypt = require('bcryptjs');
-const { prisma, seedDefaultAdmin } = require('../utils/db');
+const { prisma } = require('../utils/db');
 const { generateToken } = require('../utils/jwt.utils');
 
 /**
@@ -8,8 +8,6 @@ const { generateToken } = require('../utils/jwt.utils');
  */
 const register = async (req, res) => {
   try {
-    await seedDefaultAdmin();
-
     const { email, password, name, age, city, state, location, role } = req.body;
 
     if (!email || !password || !name) {
@@ -101,8 +99,6 @@ const register = async (req, res) => {
  */
 const login = async (req, res) => {
   try {
-    await seedDefaultAdmin();
-
     const { email, password } = req.body;
 
     if (!email || !password) {
@@ -176,7 +172,6 @@ const getMe = async (req, res) => {
         email: true,
         role: true,
         createdAt: true,
-        updatedAt: true,
         profile: true
       }
     });
@@ -184,7 +179,7 @@ const getMe = async (req, res) => {
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'User account not found'
+        message: 'User not found'
       });
     }
 
@@ -192,13 +187,11 @@ const getMe = async (req, res) => {
       success: true,
       user
     });
-
   } catch (err) {
-    console.error('GetMe Error:', err);
+    console.error('Get Me Error:', err);
     return res.status(500).json({
       success: false,
-      message: 'Server error fetching user details',
-      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+      message: 'Server error fetching user profile'
     });
   }
 };

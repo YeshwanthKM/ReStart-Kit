@@ -50,10 +50,15 @@ if (process.env.VERCEL) {
   prisma = new PrismaClient();
 }
 
+let hasSeeded = false;
+
 /**
- * Seed initial Admin and Demo User accounts if not present
+ * Seed initial Admin and Demo User accounts if not present (Runs ONLY ONCE at startup)
  */
 const seedInitialUsers = async () => {
+  if (hasSeeded) return;
+  hasSeeded = true;
+
   try {
     const adminExists = await prisma.user.findUnique({
       where: { email: 'admin@restartkit.com' }
@@ -84,7 +89,7 @@ const seedInitialUsers = async () => {
 
     // Seed Demo User 1 (Jordan Smith - Chennai)
     const jordanExists = await prisma.user.findUnique({ where: { email: 'jordan@example.com' } });
-    if (!jordanExists) {
+    if (!jordanExists && !adminExists) {
       await prisma.user.create({
         data: {
           email: 'jordan@example.com',
@@ -106,7 +111,7 @@ const seedInitialUsers = async () => {
 
     // Seed Demo User 2 (Alex Rivers - Chennai)
     const alexExists = await prisma.user.findUnique({ where: { email: 'alex@example.com' } });
-    if (!alexExists) {
+    if (!alexExists && !adminExists) {
       await prisma.user.create({
         data: {
           email: 'alex@example.com',
@@ -126,25 +131,12 @@ const seedInitialUsers = async () => {
       });
     }
 
-    // Also update existing demo users' locations to Chennai if they exist
-    await prisma.profile.updateMany({
-      where: {
-        user: {
-          email: { in: ['admin@restartkit.com', 'jordan@example.com', 'alex@example.com'] }
-        }
-      },
-      data: {
-        city: 'Chennai',
-        state: 'Tamil Nadu'
-      }
-    });
-
   } catch (err) {
     console.error('Error seeding initial users:', err);
   }
 };
 
-// Trigger auto-seeding safely
+// Trigger auto-seeding once on startup
 seedInitialUsers().catch(err => console.error("Initial seeding error:", err));
 
 module.exports = {
