@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "buildCommand": "npm run prisma:generate && cd client && npm run build",
+  "buildCommand": "cd server && npx prisma generate && npx prisma db push && cd ../client && npm run build",
   "outputDirectory": "client/dist",
   "installCommand": "npm install && cd server && npm install && cd ../client && npm install",
+  "env": {
+    "DATABASE_URL": "file:./dev.db",
+    "JWT_SECRET": "restart_kit_jwt_super_secret_key_change_in_production"
+  },
   "rewrites": [
     {
       "source": "/api/(.*)",

@@ -3,34 +3,15 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
-}
-
-enum Role {
-  USER
-  ADMIN
-}
-
-enum Priority {
-  HIGH
-  MEDIUM
-  LOW
-}
-
-enum PillarType {
-  DOCUMENTS
-  BASIC_NEEDS
-  SKILLS
-  EMPLOYMENT
-  COMMUNITY
 }
 
 model User {
   id           String      @id @default(uuid())
   email        String      @unique
   passwordHash String
-  role         Role        @default(USER)
+  role         String      @default("USER") // USER, ADMIN
   createdAt    DateTime    @default(now())
   updatedAt    DateTime    @updatedAt
 
@@ -62,8 +43,8 @@ model Assessment {
   userId      String   @unique
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   situation   String
-  needs       String[] // Array of need identifiers (e.g., ["ID_DOCS", "HOUSING"])
-  goals       String[] // Array of goal identifiers (e.g., ["FIND_JOB", "TRAINING"])
+  needs       String   @default("[]") // Stored as JSON string array e.g. "[\"ID_DOCS\",\"HOUSING\"]"
+  goals       String   @default("[]") // Stored as JSON string array e.g. "[\"FIND_JOB\"]"
   location    String?
   city        String?
   state       String?
@@ -77,7 +58,7 @@ model Assessment {
 model Pillar {
   id            String         @id @default(uuid())
   name          String
-  slug          PillarType     @unique
+  slug          String         @unique // DOCUMENTS, BASIC_NEEDS, SKILLS, EMPLOYMENT, COMMUNITY
   description   String
   icon          String?
   createdAt     DateTime       @default(now())
@@ -96,7 +77,7 @@ model TaskTemplate {
   pillar               Pillar     @relation(fields: [pillarId], references: [id], onDelete: Cascade)
   title                String
   description          String
-  priority             Priority   @default(MEDIUM)
+  priority             String     @default("MEDIUM") // HIGH, MEDIUM, LOW
   triggerNeed          String?    // Need keyword that triggers this task (e.g. "ID_DOCS")
   triggerGoal          String?    // Goal keyword that triggers this task
   defaultDaysToComplete Int       @default(7)
@@ -118,7 +99,7 @@ model UserTask {
   taskTemplate   TaskTemplate? @relation(fields: [taskTemplateId], references: [id], onDelete: SetNull)
   title          String
   description    String
-  priority       Priority      @default(MEDIUM)
+  priority       String        @default("MEDIUM") // HIGH, MEDIUM, LOW
   isCompleted    Boolean       @default(false)
   completedAt    DateTime?
   dueDate        DateTime?
