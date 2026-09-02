@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   ClipboardCheck, 
   FileText, 
@@ -19,6 +20,7 @@ import {
 
 export default function AssessmentPage({ onComplete }) {
   const { user } = useAuth();
+  const { t } = useLanguage();
 
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -60,138 +62,125 @@ export default function AssessmentPage({ onComplete }) {
   const situationOptions = [
     {
       id: 'SITUATION_JUSTICE',
-      title: 'Reentering Community',
-      desc: 'Returning home or rebuilding after involvement with the justice system.'
+      title: t('sit_justice_title'),
+      desc: t('sit_justice_desc')
     },
     {
       id: 'SITUATION_HOUSING',
-      title: 'Housing Insecurity',
-      desc: 'Currently facing homelessness, emergency shelter stay, or temporary housing.'
+      title: t('sit_housing_title'),
+      desc: t('sit_housing_desc')
     },
     {
       id: 'SITUATION_UNEMPLOYMENT',
-      title: 'Job Loss or Displacement',
-      desc: 'Seeking stable employment, vocational training, or career transition.'
+      title: t('sit_unemp_title'),
+      desc: t('sit_unemp_desc')
     },
     {
       id: 'SITUATION_DOCUMENTS',
-      title: 'Missing Identity Records',
-      desc: 'Lacking state ID, driver’s license, birth certificate, or vital papers.'
+      title: t('sit_docs_title'),
+      desc: t('sit_docs_desc')
     },
     {
       id: 'SITUATION_FRESH_START',
-      title: 'General Reintegration',
-      desc: 'Starting over in a new city or seeking comprehensive community support.'
+      title: t('sit_fresh_title'),
+      desc: t('sit_fresh_desc')
     }
   ];
 
   const pillarNeeds = [
     {
       pillar: 'DOCUMENTS',
-      title: 'Identity & Legal Documents',
+      title: t('pillar_documents'),
       icon: FileText,
       color: 'text-blue-600',
       bgColor: 'bg-blue-50',
       items: [
-        { id: 'NEED_STATE_ID', label: 'State ID / Driver License Guidance' },
-        { id: 'NEED_BIRTH_CERTIFICATE', label: 'Birth Certificate Assistance' },
-        { id: 'NEED_SSN_CARD', label: 'Social Security Card Replacement' },
-        { id: 'NEED_LEGAL_AID', label: 'Legal Documentation Support' }
+        { id: 'NEED_STATE_ID', label: t('need_state_id') },
+        { id: 'NEED_BIRTH_CERTIFICATE', label: t('need_birth_cert') },
+        { id: 'NEED_SSN_CARD', label: t('need_ssn') },
+        { id: 'NEED_LEGAL_AID', label: t('need_legal_aid') }
       ]
     },
     {
       pillar: 'BASIC_NEEDS',
-      title: 'Housing & Essential Living Needs',
+      title: t('pillar_basic_needs'),
       icon: Home,
       color: 'text-emerald-600',
       bgColor: 'bg-emerald-50',
       items: [
-        { id: 'NEED_SHELTER', label: 'Emergency Shelter / Transitional Housing' },
-        { id: 'NEED_FOOD', label: 'Food Assistance & Food Banks' },
-        { id: 'NEED_HEALTHCARE', label: 'Healthcare & Mental Health Services' },
-        { id: 'NEED_EMERGENCY_FUND', label: 'Basic Essentials & Clothing' }
+        { id: 'NEED_SHELTER', label: t('need_shelter') },
+        { id: 'NEED_FOOD', label: t('need_food') },
+        { id: 'NEED_HEALTHCARE', label: t('need_healthcare') },
+        { id: 'NEED_EMERGENCY_FUND', label: t('need_emergency_fund') }
       ]
     },
     {
       pillar: 'SKILLS',
-      title: 'Skill Development & Education',
+      title: t('pillar_skills'),
       icon: GraduationCap,
       color: 'text-amber-600',
       bgColor: 'bg-amber-50',
       items: [
-        { id: 'NEED_VOCATIONAL', label: 'Vocational & Trade Skills Training' },
-        { id: 'NEED_DIGITAL', label: 'Digital Literacy & Computer Basics' },
-        { id: 'NEED_RESUME', label: 'Resume & Job Application Training' },
-        { id: 'NEED_GED', label: 'GED / High School Diploma Prep' }
+        { id: 'NEED_VOCATIONAL', label: t('need_vocational') },
+        { id: 'NEED_DIGITAL', label: t('need_digital') },
+        { id: 'NEED_RESUME', label: t('need_resume') },
+        { id: 'NEED_GED', label: t('need_ged') }
       ]
     },
     {
       pillar: 'EMPLOYMENT',
-      title: 'Employment & Career Opportunities',
+      title: t('pillar_employment'),
       icon: Briefcase,
       color: 'text-purple-600',
       bgColor: 'bg-purple-50',
       items: [
-        { id: 'NEED_FAIR_CHANCE_JOBS', label: 'Fair-Chance Employer Network' },
-        { id: 'NEED_INTERVIEW_PREP', label: 'Interview Preparation & Coaching' },
-        { id: 'NEED_ENTRY_LEVEL_WORK', label: 'Immediate Entry-Level Opportunities' },
-        { id: 'NEED_APPRENTICESHIP', label: 'Paid Apprenticeships & Internships' }
+        { id: 'NEED_FAIR_CHANCE_JOBS', label: t('need_fair_chance') },
+        { id: 'NEED_INTERVIEW_PREP', label: t('need_interview') },
+        { id: 'NEED_ENTRY_LEVEL_WORK', label: t('need_entry_level') },
+        { id: 'NEED_APPRENTICESHIP', label: t('need_apprenticeship') }
       ]
     },
     {
       pillar: 'COMMUNITY',
-      title: 'Community Support & Mentorship',
+      title: t('pillar_community'),
       icon: Users,
       color: 'text-rose-600',
       bgColor: 'bg-rose-50',
       items: [
-        { id: 'NEED_MENTORSHIP', label: 'One-on-One Peer Mentorship' },
-        { id: 'NEED_NGO_SUPPORT', label: 'Local NGO & Non-Profit Assistance' },
-        { id: 'NEED_SUPPORT_GROUP', label: 'Support Groups & Reentry Circles' },
-        { id: 'NEED_COMMUNITY_CENTER', label: 'Community Resource Centers' }
+        { id: 'NEED_MENTORSHIP', label: t('need_mentorship') },
+        { id: 'NEED_NGO_SUPPORT', label: t('need_ngo') },
+        { id: 'NEED_SUPPORT_GROUP', label: t('need_support_group') }
       ]
     }
   ];
 
   const goalOptions = [
-    { id: 'GOAL_OBTAIN_ID', label: 'Obtain all official government ID cards' },
-    { id: 'GOAL_SECURE_HOUSING', label: 'Secure safe, long-term stable housing' },
-    { id: 'GOAL_GET_JOB', label: 'Find a reliable job with fair compensation' },
-    { id: 'GOAL_LEARN_TRADE', label: 'Complete vocational certification or digital training' },
-    { id: 'GOAL_BUILD_NETWORK', label: 'Connect with a trusted local mentor or support network' }
+    { id: 'GOAL_OBTAIN_ID', label: t('goal_obtain_id'), pillar: 'DOCUMENTS' },
+    { id: 'GOAL_GET_JOB', label: t('goal_get_job'), pillar: 'EMPLOYMENT' },
+    { id: 'GOAL_LEARN_TRADE', label: t('goal_learn_trade'), pillar: 'SKILLS' },
+    { id: 'GOAL_HOUSING', label: t('goal_housing'), pillar: 'BASIC_NEEDS' },
+    { id: 'GOAL_STABILITY', label: t('goal_stability'), pillar: 'COMMUNITY' }
   ];
 
-  const toggleNeed = (needId) => {
+  const handleToggleNeed = (needId) => {
     setSelectedNeeds(prev => 
       prev.includes(needId) ? prev.filter(id => id !== needId) : [...prev, needId]
     );
   };
 
-  const toggleGoal = (goalId) => {
+  const handleToggleGoal = (goalId) => {
     setSelectedGoals(prev => 
       prev.includes(goalId) ? prev.filter(id => id !== goalId) : [...prev, goalId]
     );
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
+    setLoading(true);
     setError(null);
     setSuccessMsg(null);
 
-    if (!situation) {
-      setError('Please select your current primary situation.');
-      setStep(1);
-      return;
-    }
-
-    if (selectedNeeds.length === 0) {
-      setError('Please select at least one immediate need.');
-      setStep(2);
-      return;
-    }
-
-    setLoading(true);
     try {
+      // 1. Save Assessment Response
       const res = await api.post('/assessment', {
         situation,
         needs: selectedNeeds,
@@ -202,70 +191,48 @@ export default function AssessmentPage({ onComplete }) {
       });
 
       if (res.data.success) {
-        setSuccessMsg('Assessment saved! Auto-generating your ReStart Kit...');
-        // Auto-generate task checklist based on assessment
+        // 2. Trigger Task Generation Engine
         try {
           await api.post('/tasks/generate');
-        } catch (genErr) {
-          console.error('Auto-generate tasks non-fatal error:', genErr);
+        } catch (taskErr) {
+          console.warn('Task generation background warning:', taskErr);
         }
-        
-        // Short delay to show success state before transitioning
+
+        setSuccessMsg('Assessment submitted successfully! Building your personalized 5-Pillar roadmap...');
         setTimeout(() => {
-          if (onComplete) onComplete(res.data.assessment);
-        }, 800);
+          if (onComplete) onComplete();
+        }, 1200);
       }
     } catch (err) {
-      console.error('Submit Assessment Error:', err);
-      setError(err.message || 'Failed to save assessment. Please try again.');
+      console.error('Assessment Submission Error:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to submit assessment. Please try again.');
+    } finally {
       setLoading(false);
     }
   };
 
-  if (fetchLoading) {
-    return (
-      <div className="min-h-[300px] flex items-center justify-center text-slate-500 space-x-2">
-        <Sparkles className="w-5 h-5 animate-spin text-emerald-600" />
-        <span className="text-sm font-medium">Loading your assessment questionnaire...</span>
-      </div>
-    );
-  }
-
   return (
     <div className="max-w-4xl mx-auto my-8 space-y-6">
       
-      {/* Step Progress Bar Header */}
-      <div className="bg-white rounded-2xl p-6 shadow-sm border border-slate-200 space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-              <ClipboardCheck className="w-6 h-6 text-emerald-600" />
-              <span>Needs & Goals Assessment</span>
-            </h2>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Step {step} of 4 — Tell us about your situation so we can build your personalized ReStart Kit.
-            </p>
-          </div>
-          <span className="text-xs font-bold px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full border border-emerald-200">
-            {step === 1 && '1. Situation'}
-            {step === 2 && '2. Needs'}
-            {step === 3 && '3. Goals'}
-            {step === 4 && '4. Location'}
+      {/* Header Banner */}
+      <div className="bg-gradient-to-r from-emerald-800 to-teal-900 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+        <div className="relative z-10 space-y-2">
+          <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-emerald-700/80 backdrop-blur-sm text-emerald-100 rounded-full text-xs font-semibold border border-emerald-500/40">
+            <ClipboardCheck className="w-3.5 h-3.5" />
+            <span>{t('assess_title')}</span>
           </span>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
-          <div 
-            className="bg-emerald-600 h-2 transition-all duration-300 rounded-full"
-            style={{ width: `${(step / 4) * 100}%` }}
-          ></div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            {t('assess_title')}
+          </h2>
+          <p className="text-emerald-100 text-sm max-w-xl">
+            {t('assess_subtitle')}
+          </p>
         </div>
       </div>
 
       {error && (
-        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-start space-x-3 text-rose-800 text-sm">
-          <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0 mt-0.5" />
+        <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center space-x-3 text-rose-800 text-sm">
+          <AlertCircle className="w-5 h-5 text-rose-600 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
@@ -277,83 +244,97 @@ export default function AssessmentPage({ onComplete }) {
         </div>
       )}
 
-      {/* Main Questionnaire Card */}
-      <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-sm border border-slate-200 min-h-[420px] flex flex-col justify-between">
-        
-        {/* STEP 1: SITUATION */}
+      {/* Progress Bar */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-2">
+        <div className="flex items-center justify-between text-xs font-bold text-slate-600">
+          <span>Step {step} of 4</span>
+          <span>{step === 1 ? 'Primary Situation' : step === 2 ? 'Immediate Needs' : step === 3 ? 'Primary Goals' : 'Location Info'}</span>
+        </div>
+        <div className="w-full bg-slate-100 rounded-full h-2 overflow-hidden">
+          <div 
+            className="bg-emerald-600 h-2 rounded-full transition-all duration-300"
+            style={{ width: `${(step / 4) * 100}%` }}
+          ></div>
+        </div>
+      </div>
+
+      {/* Main Wizard Form Container */}
+      <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">
+
+        {/* STEP 1: Primary Situation Selection */}
         {step === 1 && (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">What best describes your current situation?</h3>
-              <p className="text-xs text-slate-500 mt-1">Select the primary option that reflects your starting point right now.</p>
+              <h3 className="text-lg font-bold text-slate-900">{t('assess_step1_title')}</h3>
+              <p className="text-xs text-slate-500">{t('assess_step1_desc')}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="space-y-3">
               {situationOptions.map((opt) => (
-                <button
+                <div
                   key={opt.id}
-                  type="button"
                   onClick={() => setSituation(opt.id)}
-                  className={`p-5 rounded-2xl text-left border transition-all relative ${
+                  className={`p-4 rounded-xl border cursor-pointer transition-all flex items-start space-x-3 ${
                     situation === opt.id
-                      ? 'bg-emerald-50/80 border-emerald-500 shadow-sm'
-                      : 'bg-slate-50 hover:bg-slate-100 border-slate-200'
+                      ? 'border-emerald-600 bg-emerald-50/70 shadow-sm'
+                      : 'border-slate-200 hover:border-slate-300 bg-white'
                   }`}
                 >
-                  <div className="flex items-start justify-between">
-                    <h4 className="font-bold text-sm text-slate-900">{opt.title}</h4>
-                    {situation === opt.id && (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
-                    )}
+                  <div className={`w-5 h-5 rounded-full border flex items-center justify-center mt-0.5 flex-shrink-0 ${
+                    situation === opt.id ? 'border-emerald-600 bg-emerald-600 text-white' : 'border-slate-300'
+                  }`}>
+                    {situation === opt.id && <CheckCircle2 className="w-4 h-4" />}
                   </div>
-                  <p className="text-xs text-slate-600 mt-2 leading-relaxed">{opt.desc}</p>
-                </button>
+                  <div>
+                    <h4 className="text-sm font-bold text-slate-900">{opt.title}</h4>
+                    <p className="text-xs text-slate-600 mt-0.5 leading-relaxed">{opt.desc}</p>
+                  </div>
+                </div>
               ))}
             </div>
           </div>
         )}
 
-        {/* STEP 2: NEEDS */}
+        {/* STEP 2: Immediate Needs Selection across 5 Pillars */}
         {step === 2 && (
           <div className="space-y-6">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">What are your immediate needs?</h3>
-              <p className="text-xs text-slate-500 mt-1">Select all items you need support with across the 5 reintegration pillars.</p>
+              <h3 className="text-lg font-bold text-slate-900">{t('assess_step2_title')}</h3>
+              <p className="text-xs text-slate-500">{t('assess_step2_desc')}</p>
             </div>
 
             <div className="space-y-6">
-              {pillarNeeds.map((group) => {
-                const Icon = group.icon;
+              {pillarNeeds.map((p) => {
+                const Icon = p.icon;
                 return (
-                  <div key={group.pillar} className="space-y-3">
+                  <div key={p.pillar} className="space-y-3">
                     <div className="flex items-center space-x-2">
-                      <div className={`w-7 h-7 rounded-lg ${group.bgColor} flex items-center justify-center`}>
-                        <Icon className={`w-4 h-4 ${group.color}`} />
+                      <div className={`p-1.5 rounded-lg ${p.bgColor} ${p.color}`}>
+                        <Icon className="w-4 h-4" />
                       </div>
-                      <h4 className="text-sm font-bold text-slate-900">{group.title}</h4>
+                      <h4 className="text-sm font-bold text-slate-900">{p.title}</h4>
                     </div>
 
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {group.items.map((item) => {
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                      {p.items.map((item) => {
                         const isChecked = selectedNeeds.includes(item.id);
                         return (
-                          <button
+                          <div
                             key={item.id}
-                            type="button"
-                            onClick={() => toggleNeed(item.id)}
-                            className={`p-3.5 rounded-xl border text-left text-xs font-medium transition-all flex items-center justify-between ${
+                            onClick={() => handleToggleNeed(item.id)}
+                            className={`p-3 rounded-xl border text-xs font-semibold cursor-pointer transition-all flex items-center space-x-2.5 ${
                               isChecked
-                                ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-semibold'
-                                : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-700'
+                                ? 'border-emerald-600 bg-emerald-50/70 text-emerald-900 shadow-sm'
+                                : 'border-slate-200 hover:border-slate-300 text-slate-700 bg-white'
                             }`}
                           >
-                            <span>{item.label}</span>
-                            <div className={`w-5 h-5 rounded-md border flex items-center justify-center ${
-                              isChecked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
+                            <div className={`w-4 h-4 rounded border flex items-center justify-center flex-shrink-0 ${
+                              isChecked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300'
                             }`}>
-                              {isChecked && <CheckCircle2 className="w-3.5 h-3.5" />}
+                              {isChecked && <CheckCircle2 className="w-3 h-3" />}
                             </div>
-                          </button>
+                            <span>{item.label}</span>
+                          </div>
                         );
                       })}
                     </div>
@@ -364,142 +345,128 @@ export default function AssessmentPage({ onComplete }) {
           </div>
         )}
 
-        {/* STEP 3: GOALS */}
+        {/* STEP 3: Primary Reintegration Goals */}
         {step === 3 && (
-          <div className="space-y-5">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">What are your top goals?</h3>
-              <p className="text-xs text-slate-500 mt-1">Select the key milestones you want to achieve over the next 3 to 6 months.</p>
+              <h3 className="text-lg font-bold text-slate-900">{t('assess_step3_title')}</h3>
+              <p className="text-xs text-slate-500">{t('assess_step3_desc')}</p>
             </div>
 
             <div className="space-y-3">
-              {goalOptions.map((goal) => {
-                const isSelected = selectedGoals.includes(goal.id);
+              {goalOptions.map((g) => {
+                const isChecked = selectedGoals.includes(g.id);
                 return (
-                  <button
-                    key={goal.id}
-                    type="button"
-                    onClick={() => toggleGoal(goal.id)}
-                    className={`w-full p-4 rounded-xl border text-left text-sm font-medium transition-all flex items-center justify-between ${
-                      isSelected
-                        ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold shadow-sm'
-                        : 'bg-slate-50 hover:bg-slate-100 border-slate-200 text-slate-800'
+                  <div
+                    key={g.id}
+                    onClick={() => handleToggleGoal(g.id)}
+                    className={`p-4 rounded-xl border cursor-pointer transition-all flex items-center space-x-3 ${
+                      isChecked
+                        ? 'border-emerald-600 bg-emerald-50/70 text-emerald-900 shadow-sm'
+                        : 'border-slate-200 hover:border-slate-300 bg-white text-slate-800'
                     }`}
                   >
-                    <span>{goal.label}</span>
-                    <div className={`w-5 h-5 rounded-md border flex items-center justify-center ${
-                      isSelected ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300 bg-white'
+                    <div className={`w-5 h-5 rounded border flex items-center justify-center flex-shrink-0 ${
+                      isChecked ? 'bg-emerald-600 border-emerald-600 text-white' : 'border-slate-300'
                     }`}>
-                      {isSelected && <CheckCircle2 className="w-3.5 h-3.5" />}
+                      {isChecked && <CheckCircle2 className="w-4 h-4" />}
                     </div>
-                  </button>
+                    <span className="text-sm font-bold">{g.label}</span>
+                  </div>
                 );
               })}
             </div>
           </div>
         )}
 
-        {/* STEP 4: LOCATION & REVIEW */}
+        {/* STEP 4: Location Info */}
         {step === 4 && (
-          <div className="space-y-6">
+          <div className="space-y-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-900">Location & Final Review</h3>
-              <p className="text-xs text-slate-500 mt-1">Specify your location so we can filter local community support resources near you.</p>
+              <h3 className="text-lg font-bold text-slate-900">{t('assess_step4_title')}</h3>
+              <p className="text-xs text-slate-500">{t('assess_step4_desc')}</p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">City <span className="text-rose-500">*</span></label>
-                <div className="relative">
-                  <Building className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Chennai"
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-                  />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">City <span className="text-rose-500">*</span></label>
+                  <div className="relative">
+                    <Building className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={city}
+                      onChange={(e) => setCity(e.target.value)}
+                      placeholder="e.g. Chennai"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">State <span className="text-rose-500">*</span></label>
+                  <div className="relative">
+                    <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                    <input
+                      type="text"
+                      value={state}
+                      onChange={(e) => setState(e.target.value)}
+                      placeholder="e.g. Tamil Nadu"
+                      className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                    />
+                  </div>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">State <span className="text-rose-500">*</span></label>
-                <div className="relative">
-                  <MapPin className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
-                  <input
-                    type="text"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="e.g. Tamil Nadu"
-                    className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Neighborhood / Circle (Optional)</label>
+                <input
+                  type="text"
+                  value={location}
+                  onChange={(e) => setLocation(e.target.value)}
+                  placeholder="e.g. Anna Nagar / T. Nagar / Tambaram / Guindy"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+                />
               </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Neighborhood / Circle (Optional)</label>
-              <input
-                type="text"
-                value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Anna Nagar / T. Nagar / Tambaram / Guindy"
-                className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-              />
-            </div>
-
-            {/* Review Box */}
-            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 text-xs space-y-2">
-              <div className="font-bold text-slate-900 border-b border-slate-200 pb-2">Assessment Summary</div>
-              <div><span className="font-semibold">Selected Situation:</span> {situationOptions.find(s => s.id === situation)?.title || 'Not selected'}</div>
-              <div><span className="font-semibold">Needs Selected:</span> {selectedNeeds.length} item(s) across pillars</div>
-              <div><span className="font-semibold">Goals Selected:</span> {selectedGoals.length} objective(s)</div>
             </div>
           </div>
         )}
 
-        {/* Step Navigation Controls */}
-        <div className="pt-8 border-t border-slate-200 flex items-center justify-between">
+        {/* Wizard Controls Footer */}
+        <div className="pt-4 border-t border-slate-200 flex items-center justify-between">
           {step > 1 ? (
             <button
-              type="button"
-              onClick={() => setStep(prev => prev - 1)}
-              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-sm rounded-xl transition-colors flex items-center space-x-1.5"
+              onClick={() => setStep(step - 1)}
+              className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors flex items-center space-x-1"
             >
-              <ArrowLeft className="w-4 h-4" />
-              <span>Back</span>
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>{t('assess_btn_prev')}</span>
             </button>
           ) : <div></div>}
 
           {step < 4 ? (
             <button
-              type="button"
-              onClick={() => {
-                if (step === 1 && !situation) {
-                  setError('Please select a situation before continuing.');
-                  return;
-                }
-                if (step === 2 && selectedNeeds.length === 0) {
-                  setError('Please select at least one need before continuing.');
-                  return;
-                }
-                setError(null);
-                setStep(prev => prev + 1);
-              }}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl shadow-md transition-colors flex items-center space-x-2"
+              onClick={() => setStep(step + 1)}
+              disabled={step === 1 && !situation}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center space-x-1.5 disabled:opacity-50"
             >
-              <span>Continue</span>
-              <ArrowRight className="w-4 h-4" />
+              <span>{t('assess_btn_next')}</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </button>
           ) : (
             <button
-              type="button"
               onClick={handleSubmit}
-              disabled={loading}
-              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
+              disabled={loading || !city || !state}
+              className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-2 disabled:opacity-50"
             >
-              <Sparkles className="w-4 h-4" />
-              <span>{loading ? 'Building Roadmap...' : 'Complete Assessment'}</span>
+              {loading ? (
+                <span>{t('assess_btn_submitting')}</span>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-emerald-200" />
+                  <span>{t('assess_btn_complete')}</span>
+                </>
+              )}
             </button>
           )}
         </div>

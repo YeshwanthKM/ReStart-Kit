@@ -1,57 +1,61 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   Building2, 
   MapPin, 
   Phone, 
-  Mail, 
   Globe, 
-  CheckCircle2, 
   Search, 
+  ShieldCheck, 
   Plus, 
   Trash2, 
-  X, 
-  FileText, 
-  Home, 
-  GraduationCap, 
-  Briefcase, 
-  Users, 
-  Layers, 
+  CheckCircle2, 
+  AlertCircle, 
   RefreshCw,
-  AlertCircle,
-  ShieldCheck
+  FileText,
+  Home,
+  GraduationCap,
+  Briefcase,
+  Users,
+  Layers,
+  X
 } from 'lucide-react';
 
 export default function ResourceDirectoryPage() {
   const { user, isAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [resources, setResources] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [successMsg, setSuccessMsg] = useState(null);
 
   // Filters
   const [selectedPillar, setSelectedPillar] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
   const [cityFilter, setCityFilter] = useState('');
 
-  // Admin Modal
+  // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalLoading, setModalLoading] = useState(false);
-  const [modalError, setModalError] = useState(null);
-
-  // New Resource Form
-  const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
-  const [pillarSlug, setPillarSlug] = useState('DOCUMENTS');
-  const [category, setCategory] = useState('');
-  const [address, setAddress] = useState('');
-  const [city, setCity] = useState(user?.profile?.city || 'Chennai');
-  const [state, setState] = useState(user?.profile?.state || 'Tamil Nadu');
-  const [zipCode, setZipCode] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
-  const [website, setWebsite] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    organization: '',
+    description: '',
+    pillarSlug: 'DOCUMENTS',
+    category: '',
+    address: '',
+    city: user?.profile?.city || 'Chennai',
+    state: user?.profile?.state || 'Tamil Nadu',
+    zipCode: '',
+    phone: '',
+    email: '',
+    website: '',
+    isLocationBased: true,
+    isVerified: true
+  });
 
   const fetchResources = async () => {
     setLoading(true);
@@ -60,7 +64,7 @@ export default function ResourceDirectoryPage() {
       let url = '/resources';
       const params = new URLSearchParams();
       if (selectedPillar !== 'ALL') params.append('pillarSlug', selectedPillar);
-      if (searchQuery) params.append('search', searchQuery);
+      if (searchQuery) params.append('query', searchQuery);
       if (cityFilter) params.append('city', cityFilter);
 
       if (params.toString()) {
@@ -88,57 +92,41 @@ export default function ResourceDirectoryPage() {
     fetchResources();
   };
 
-  const handleCreateResource = async (e) => {
+  const handleAddResource = async (e) => {
     e.preventDefault();
-    setModalError(null);
-    setModalLoading(true);
+    setSubmitting(true);
+    setError(null);
+    setSuccessMsg(null);
 
     try {
-      const res = await api.post('/resources', {
-        title,
-        description,
-        pillarSlug,
-        category,
-        address,
-        city,
-        state,
-        zipCode,
-        phone,
-        email,
-        website
-      });
-
+      const res = await api.post('/resources', formData);
       if (res.data.success) {
+        setSuccessMsg(`Resource "${formData.name}" added successfully!`);
         setIsModalOpen(false);
-        // Reset form
-        setTitle('');
-        setDescription('');
-        setCategory('');
-        setAddress('');
-        setPhone('');
-        setEmail('');
-        setWebsite('');
         fetchResources();
       }
     } catch (err) {
-      console.error('Create resource error:', err);
-      setModalError(err.response?.data?.message || err.message || 'Failed to create resource');
+      console.error('Add resource error:', err);
+      setError(err.response?.data?.message || err.message || 'Failed to add resource');
     } finally {
-      setModalLoading(false);
+      setSubmitting(false);
     }
   };
 
-  const handleDeleteResource = async (resourceId) => {
-    if (!window.confirm('Are you sure you want to remove this resource listing?')) return;
+  const handleDeleteResource = async (id, title) => {
+    if (!window.confirm(`Are you sure you want to delete resource "${title}"?`)) return;
 
+    setError(null);
+    setSuccessMsg(null);
     try {
-      const res = await api.delete(`/resources/${resourceId}`);
+      const res = await api.delete(`/resources/${id}`);
       if (res.data.success) {
-        setResources(prev => prev.filter(r => r.id !== resourceId));
+        setSuccessMsg(`Resource "${title}" deleted.`);
+        fetchResources();
       }
     } catch (err) {
       console.error('Delete resource error:', err);
-      alert('Failed to delete resource.');
+      setError(err.message || 'Failed to delete resource');
     }
   };
 
@@ -154,12 +142,12 @@ export default function ResourceDirectoryPage() {
   };
 
   const pillarsList = [
-    { slug: 'ALL', name: 'All Resources' },
-    { slug: 'DOCUMENTS', name: '1. Documents' },
-    { slug: 'BASIC_NEEDS', name: '2. Basic Needs' },
-    { slug: 'SKILLS', name: '3. Skills' },
-    { slug: 'EMPLOYMENT', name: '4. Employment' },
-    { slug: 'COMMUNITY', name: '5. Community' }
+    { slug: 'ALL', name: t('roadmap_all_pillars') },
+    { slug: 'DOCUMENTS', name: t('pillar_documents') },
+    { slug: 'BASIC_NEEDS', name: t('pillar_basic_needs') },
+    { slug: 'SKILLS', name: t('pillar_skills') },
+    { slug: 'EMPLOYMENT', name: t('pillar_employment') },
+    { slug: 'COMMUNITY', name: t('pillar_community') }
   ];
 
   return (
@@ -171,25 +159,33 @@ export default function ResourceDirectoryPage() {
           <div className="space-y-2 max-w-xl">
             <span className="inline-flex items-center space-x-1.5 px-3 py-1 bg-emerald-700/80 backdrop-blur-sm text-emerald-100 rounded-full text-xs font-semibold border border-emerald-500/40">
               <Building2 className="w-3.5 h-3.5" />
-              <span>Verified Reintegration Directory</span>
+              <span>{t('res_title')}</span>
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Verified Local Support Resources</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('res_title')}</h2>
             <p className="text-emerald-100 text-sm leading-relaxed">
-              Discover verified shelters, legal document aid centers, vocational labs, fair-chance employers, and community NGOs near you.
+              {t('res_subtitle')}
             </p>
           </div>
 
           {isAdmin && (
             <button
               onClick={() => setIsModalOpen(true)}
-              className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 self-start md:self-auto"
+              className="px-4 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-bold text-xs rounded-xl shadow-md transition-all flex items-center space-x-1.5 self-start md:self-auto"
             >
-              <Plus className="w-4 h-4" />
-              <span>Add Verified Resource</span>
+              <Plus className="w-4 h-4 text-emerald-700" />
+              <span>{t('res_add_modal_btn')}</span>
             </button>
           )}
         </div>
       </div>
+
+      {/* Messages */}
+      {successMsg && (
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-center space-x-3 text-emerald-800 text-sm">
+          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+          <span>{successMsg}</span>
+        </div>
+      )}
 
       {error && (
         <div className="p-4 bg-rose-50 border border-rose-200 rounded-xl flex items-center space-x-3 text-rose-800 text-sm">
@@ -198,164 +194,147 @@ export default function ResourceDirectoryPage() {
         </div>
       )}
 
-      {/* Search & Filter Controls Bar */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4">
+      {/* Search & Filter Bar */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm space-y-4">
         
         <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row items-center gap-3">
-          
-          {/* Keyword Search */}
-          <div className="relative flex-grow w-full">
+          <div className="relative flex-1 w-full">
             <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search by title, service, category, or city..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
+              placeholder={t('res_search_placeholder')}
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
             />
           </div>
 
-          {/* City Filter */}
-          <div className="relative w-full sm:w-48">
-            <MapPin className="w-4 h-4 text-slate-400 absolute left-3.5 top-3" />
-            <input
-              type="text"
+          <div className="w-full sm:w-48">
+            <select
               value={cityFilter}
               onChange={(e) => setCityFilter(e.target.value)}
-              placeholder="Filter by City..."
-              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
-            />
+              className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            >
+              <option value="">{t('res_all_cities')}</option>
+              <option value="Chennai">Chennai</option>
+            </select>
           </div>
 
           <button
             type="submit"
-            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-xl shadow-sm transition-colors w-full sm:w-auto flex items-center justify-center space-x-1.5"
+            className="w-full sm:w-auto px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all"
           >
-            <Search className="w-4 h-4" />
-            <span>Search</span>
+            Search
           </button>
         </form>
 
         {/* Pillar Filter Tabs */}
-        <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none pt-2 border-t border-slate-100">
-          {pillarsList.map(p => (
+        <div className="flex items-center flex-wrap gap-1.5 pt-2 border-t border-slate-100">
+          {pillarsList.map((p) => (
             <button
               key={p.slug}
               onClick={() => setSelectedPillar(p.slug)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
                 selectedPillar === p.slug
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
               }`}
             >
               {p.name}
             </button>
           ))}
         </div>
+
       </div>
 
       {/* Resource Cards Grid */}
       {loading ? (
-        <div className="p-12 bg-white rounded-2xl border border-slate-200 text-center text-slate-500 flex flex-col items-center justify-center space-y-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-          <span className="text-sm font-medium">Searching verified support resources...</span>
+        <div className="p-12 text-center text-slate-500 space-y-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <RefreshCw className="w-6 h-6 animate-spin text-emerald-600 mx-auto" />
+          <p className="text-xs font-semibold">Fetching local support resources...</p>
         </div>
       ) : resources.length === 0 ? (
-        <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-3 text-slate-500">
-          <Building2 className="w-10 h-10 text-slate-400 mx-auto" />
-          <h3 className="text-base font-bold text-slate-800">No Verified Resources Found</h3>
-          <p className="text-xs">Try clearing your search query or switching pillar filters.</p>
+        <div className="p-10 text-center text-slate-500 space-y-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <Building2 className="w-8 h-8 text-slate-400 mx-auto" />
+          <p className="text-xs">No local resources found matching your search criteria.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {resources.map((res) => {
-            const PillarIcon = getPillarIcon(res.pillar?.slug);
+            const Icon = getPillarIcon(res.pillar?.slug);
             return (
               <div 
-                key={res.id} 
-                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all space-y-4 flex flex-col justify-between"
+                key={res.id}
+                className="bg-white rounded-2xl p-6 border border-slate-200 shadow-sm hover:shadow-md transition-all flex flex-col justify-between space-y-4"
               >
                 <div className="space-y-3">
-                  
-                  {/* Card Header & Badges */}
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="space-y-1">
-                      <div className="flex items-center space-x-2 flex-wrap gap-1">
-                        <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px] border border-slate-200">
-                          <PillarIcon className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>{res.pillar?.name || 'General'}</span>
-                        </span>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="px-2.5 py-1 rounded-md bg-slate-100 text-slate-800 text-[11px] font-bold border border-slate-200 flex items-center space-x-1">
+                      <Icon className="w-3.5 h-3.5 text-slate-600" />
+                      <span>{res.pillar?.name}</span>
+                    </span>
 
-                        <span className="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-800 font-semibold text-[10px] border border-emerald-200">
-                          {res.category}
-                        </span>
-                      </div>
-                    </div>
-
-                    {/* Verified Badge */}
                     {res.isVerified && (
-                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-[10px] border border-emerald-300 flex-shrink-0" title="Verified Provider">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        <span>Verified</span>
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200 flex items-center space-x-1">
+                        <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                        <span>{t('res_verified_badge')}</span>
                       </span>
                     )}
                   </div>
 
-                  {/* Title */}
-                  <h3 className="text-base font-bold text-slate-900 leading-snug">{res.title}</h3>
-
-                  {/* Description */}
-                  <p className="text-xs text-slate-600 leading-relaxed">{res.description}</p>
-                </div>
-
-                {/* Contact & Location Footer */}
-                <div className="pt-3 border-t border-slate-100 text-xs text-slate-600 space-y-2">
-                  
-                  {res.address && (
-                    <div className="flex items-start space-x-2">
-                      <MapPin className="w-3.5 h-3.5 text-slate-400 flex-shrink-0 mt-0.5" />
-                      <span>{res.address}, {res.city}, {res.state} {res.zipCode || ''}</span>
-                    </div>
-                  )}
-
-                  <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
-                    {res.phone && (
-                      <a 
-                        href={`tel:${res.phone}`} 
-                        className="inline-flex items-center space-x-1 text-slate-700 font-semibold hover:text-emerald-600 transition-colors"
-                      >
-                        <Phone className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{res.phone}</span>
-                      </a>
-                    )}
-
-                    {res.website && (
-                      <a 
-                        href={res.website.startsWith('http') ? res.website : `https://${res.website}`} 
-                        target="_blank" 
-                        rel="noopener noreferrer" 
-                        className="inline-flex items-center space-x-1 text-emerald-600 font-bold hover:underline"
-                      >
-                        <Globe className="w-3.5 h-3.5" />
-                        <span>Visit Website</span>
-                      </a>
+                  <div>
+                    <h3 className="text-base font-bold text-slate-900">{res.title}</h3>
+                    {res.organization && (
+                      <p className="text-xs text-emerald-700 font-semibold mt-0.5">{res.organization}</p>
                     )}
                   </div>
 
-                  {/* Admin Action Bar */}
+                  <p className="text-xs text-slate-600 leading-relaxed">{res.description}</p>
+                </div>
+
+                {/* Contact & Location Details */}
+                <div className="pt-3 border-t border-slate-100 space-y-2 text-xs text-slate-600">
+                  {res.address && (
+                    <div className="flex items-start space-x-2">
+                      <MapPin className="w-3.5 h-3.5 text-slate-400 mt-0.5 flex-shrink-0" />
+                      <span>{res.address}{res.city ? `, ${res.city}` : ''}{res.state ? `, ${res.state}` : ''}</span>
+                    </div>
+                  )}
+
+                  {res.phone && (
+                    <div className="flex items-center space-x-2">
+                      <Phone className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                      <a href={`tel:${res.phone}`} className="hover:text-emerald-700 font-medium">{res.phone}</a>
+                    </div>
+                  )}
+
+                  {res.website && (
+                    <div className="flex items-center space-x-2">
+                      <Globe className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                      <a 
+                        href={res.website.startsWith('http') ? res.website : `https://${res.website}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="text-emerald-600 hover:underline font-semibold"
+                      >
+                        Visit Official Website
+                      </a>
+                    </div>
+                  )}
+
                   {isAdmin && (
                     <div className="pt-2 flex justify-end">
                       <button
-                        onClick={() => handleDeleteResource(res.id)}
-                        className="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-700 text-[11px] font-semibold rounded-lg border border-rose-200 transition-colors flex items-center space-x-1"
+                        onClick={() => handleDeleteResource(res.id, res.title)}
+                        className="text-rose-600 hover:text-rose-800 text-[11px] font-bold flex items-center space-x-1"
                       >
                         <Trash2 className="w-3 h-3" />
                         <span>Delete Listing</span>
                       </button>
                     </div>
                   )}
-
                 </div>
+
               </div>
             );
           })}
@@ -364,157 +343,135 @@ export default function ResourceDirectoryPage() {
 
       {/* Admin Add Resource Modal */}
       {isModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-xl w-full p-6 sm:p-8 space-y-5 shadow-2xl relative max-h-[90vh] overflow-y-auto">
-            
-            <div className="flex items-center justify-between border-b border-slate-200 pb-4">
-              <div className="flex items-center space-x-2">
-                <ShieldCheck className="w-5 h-5 text-purple-600" />
-                <h3 className="text-lg font-bold text-slate-900">Add Verified Resource</h3>
-              </div>
-              <button
-                onClick={() => setIsModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600"
-              >
+        <div className="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 sm:p-8 shadow-2xl border border-slate-200 space-y-6 max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-slate-900">Add Verified Resource</h3>
+              <button onClick={() => setIsModalOpen(false)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            {modalError && (
-              <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-800">
-                {modalError}
-              </div>
-            )}
-
-            <form onSubmit={handleCreateResource} className="space-y-4 text-xs">
-              
+            <form onSubmit={handleAddResource} className="space-y-4 text-xs">
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Organization / Title <span className="text-rose-500">*</span></label>
+                <label className="block font-bold text-slate-700 mb-1">Resource Name *</label>
                 <input
                   type="text"
-                  value={title}
-                  onChange={(e) => setTitle(e.target.value)}
-                  placeholder="e.g. Seattle Reentry Legal Clinic"
                   required
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  value={formData.name}
+                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                  placeholder="e.g. District Employment Exchange"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Reintegration Pillar <span className="text-rose-500">*</span></label>
-                  <select
-                    value={pillarSlug}
-                    onChange={(e) => setPillarSlug(e.target.value)}
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 font-medium"
-                  >
-                    <option value="DOCUMENTS">1. Documents</option>
-                    <option value="BASIC_NEEDS">2. Basic Needs</option>
-                    <option value="SKILLS">3. Skills</option>
-                    <option value="EMPLOYMENT">4. Employment</option>
-                    <option value="COMMUNITY">5. Community</option>
-                  </select>
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Organization *</label>
+                <input
+                  type="text"
+                  required
+                  value={formData.organization}
+                  onChange={(e) => setFormData(prev => ({ ...prev, organization: e.target.value }))}
+                  placeholder="e.g. Dept of Employment & Training"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                />
+              </div>
 
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Pillar *</label>
+                <select
+                  value={formData.pillarSlug}
+                  onChange={(e) => setFormData(prev => ({ ...prev, pillarSlug: e.target.value }))}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl font-semibold"
+                >
+                  <option value="DOCUMENTS">Documents</option>
+                  <option value="BASIC_NEEDS">Basic Needs</option>
+                  <option value="SKILLS">Skills & Education</option>
+                  <option value="EMPLOYMENT">Employment</option>
+                  <option value="COMMUNITY">Community</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Description *</label>
+                <textarea
+                  required
+                  rows="3"
+                  value={formData.description}
+                  onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+                  placeholder="Service description..."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                ></textarea>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Category Tag</label>
+                  <label className="block font-bold text-slate-700 mb-1">City</label>
                   <input
                     type="text"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    placeholder="e.g. Emergency Shelter / Legal Aid"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
+                    value={formData.city}
+                    onChange={(e) => setFormData(prev => ({ ...prev, city: e.target.value }))}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                  />
+                </div>
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1">State</label>
+                  <input
+                    type="text"
+                    value={formData.state}
+                    onChange={(e) => setFormData(prev => ({ ...prev, state: e.target.value }))}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Description <span className="text-rose-500">*</span></label>
-                <textarea
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  placeholder="Describe services provided..."
-                  rows={3}
-                  required
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                ></textarea>
+                <label className="block font-bold text-slate-700 mb-1">Street Address</label>
+                <input
+                  type="text"
+                  value={formData.address}
+                  onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
+                  placeholder="e.g. Santhome High Road, Mylapore"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-2">
-                  <label className="block font-semibold text-slate-700 mb-1">Street Address</label>
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    placeholder="e.g. 100 Main St"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">City <span className="text-rose-500">*</span></label>
-                  <input
-                    type="text"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    placeholder="Seattle"
-                    required
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
+                <input
+                  type="text"
+                  value={formData.phone}
+                  onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
+                  placeholder="e.g. 044-24615160"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">State <span className="text-rose-500">*</span></label>
-                  <input
-                    type="text"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    placeholder="WA"
-                    required
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Phone</label>
-                  <input
-                    type="text"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(206) 555-0199"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Website URL</label>
-                  <input
-                    type="text"
-                    value={website}
-                    onChange={(e) => setWebsite(e.target.value)}
-                    placeholder="https://example.org"
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500"
-                  />
-                </div>
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Website URL</label>
+                <input
+                  type="text"
+                  value={formData.website}
+                  onChange={(e) => setFormData(prev => ({ ...prev, website: e.target.value }))}
+                  placeholder="https://..."
+                  className="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl"
+                />
               </div>
 
-              <div className="pt-4 border-t border-slate-200 flex items-center justify-end space-x-3">
+              <div className="pt-3 flex justify-end space-x-3">
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold rounded-xl"
+                  className="px-4 py-2 bg-slate-100 text-slate-700 font-semibold rounded-xl"
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
-                  disabled={modalLoading}
-                  className="px-5 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-xl shadow-md disabled:opacity-50"
+                  disabled={submitting}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl"
                 >
-                  {modalLoading ? 'Saving...' : 'Add Verified Resource'}
+                  {submitting ? 'Adding...' : 'Save Resource'}
                 </button>
               </div>
 

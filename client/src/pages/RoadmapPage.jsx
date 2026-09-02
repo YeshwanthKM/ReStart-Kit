@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { 
   CheckSquare, 
   Square, 
@@ -22,6 +23,7 @@ import {
 
 export default function RoadmapPage({ onNavigateToAssessment }) {
   const { user, isAdmin } = useAuth();
+  const { t } = useLanguage();
 
   const [tasks, setTasks] = useState([]);
   const [stats, setStats] = useState({ total: 0, completed: 0, pending: 0, progressPercent: 0 });
@@ -72,53 +74,16 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
     fetchTasks(true);
   }, [selectedPillar, selectedStatus]);
 
-  const handleGenerateTasks = async (isAuto = false) => {
-    setGenLoading(true);
-    if (!isAuto) {
-      setError(null);
-      setSuccessMsg(null);
-    }
-    try {
-      const res = await api.post('/tasks/generate');
-      if (res.data.success) {
-        if (!isAuto) {
-          setSuccessMsg(res.data.message || 'ReStart Kit generated successfully!');
-        }
-        // Refetch after generation
-        const refetchRes = await api.get('/tasks');
-        if (refetchRes.data.success) {
-          setTasks(refetchRes.data.tasks || []);
-          setStats(refetchRes.data.stats || { total: 0, completed: 0, pending: 0, progressPercent: 0 });
-        }
-      }
-    } catch (err) {
-      console.error('Generate tasks error:', err);
-      if (!isAuto) {
-        if (err.response && err.response.data && err.response.data.message) {
-          setError(err.response.data.message);
-        } else {
-          setError('Please complete your Needs & Goals Assessment first.');
-        }
-      }
-    } finally {
-      setGenLoading(false);
-      setLoading(false);
-    }
-  };
-
   const handleToggleTask = async (taskId) => {
     // Optimistic UI update
-    setTasks(prev => prev.map(t => {
-      if (t.id === taskId) {
-        const nextState = !t.isCompleted;
-        return {
-          ...t,
-          isCompleted: nextState,
-          completedAt: nextState ? new Date().toISOString() : null
-        };
-      }
-      return t;
-    }));
+    setTasks(prevTasks => 
+      prevTasks.map(t => {
+        if (t.id === taskId) {
+          return { ...t, isCompleted: !t.isCompleted };
+        }
+        return t;
+      })
+    );
 
     try {
       const res = await api.patch(`/tasks/${taskId}/toggle`);
@@ -127,7 +92,30 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
       }
     } catch (err) {
       console.error('Toggle task error:', err);
+      setError(err.message || 'Failed to update task completion status');
       fetchTasks(false);
+    }
+  };
+
+  const handleGenerateTasks = async (isAuto = false) => {
+    setGenLoading(true);
+    setError(null);
+    setSuccessMsg(null);
+    try {
+      const res = await api.post('/tasks/generate');
+      if (res.data.success) {
+        if (!isAuto) {
+          setSuccessMsg(res.data.message || 'Tasks generated based on your assessment!');
+        }
+        fetchTasks(false);
+      }
+    } catch (err) {
+      console.error('Task generation error:', err);
+      if (!isAuto) {
+        setError(err.response?.data?.message || err.message || 'Please complete your assessment survey to generate tasks.');
+      }
+    } finally {
+      setGenLoading(false);
     }
   };
 
@@ -156,12 +144,12 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
   };
 
   const pillarsList = [
-    { slug: 'ALL', name: 'All Pillars' },
-    { slug: 'DOCUMENTS', name: '1. Documents' },
-    { slug: 'BASIC_NEEDS', name: '2. Basic Needs' },
-    { slug: 'SKILLS', name: '3. Skills' },
-    { slug: 'EMPLOYMENT', name: '4. Employment' },
-    { slug: 'COMMUNITY', name: '5. Community' }
+    { slug: 'ALL', name: t('roadmap_all_pillars') },
+    { slug: 'DOCUMENTS', name: `1. ${t('pillar_documents')}` },
+    { slug: 'BASIC_NEEDS', name: `2. ${t('pillar_basic_needs')}` },
+    { slug: 'SKILLS', name: `3. ${t('pillar_skills')}` },
+    { slug: 'EMPLOYMENT', name: `4. ${t('pillar_employment')}` },
+    { slug: 'COMMUNITY', name: `5. ${t('pillar_community')}` }
   ];
 
   return (
@@ -172,18 +160,18 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
             <span className="inline-block px-3 py-1 bg-emerald-700/80 backdrop-blur-sm text-emerald-100 rounded-full text-xs font-semibold border border-emerald-500/40">
-              Personalized ReStart Checklist
+              {t('roadmap_title')}
             </span>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">Your ReStart Kit Roadmap</h2>
+            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t('roadmap_title')}</h2>
             <p className="text-emerald-100 text-sm leading-relaxed">
-              Step-by-step actionable tasks tailored to your assessment needs across the 5 Reintegration Pillars.
+              {t('roadmap_subtitle')}
             </p>
           </div>
 
           {/* Progress Ring Box */}
           <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-5 text-center min-w-[200px] flex flex-col items-center justify-center">
             <div className="text-3xl font-black text-white">{stats.progressPercent}%</div>
-            <div className="text-xs font-semibold text-emerald-200 mt-0.5">Overall Progress</div>
+            <div className="text-xs font-semibold text-emerald-200 mt-0.5">{t('dash_overall_progress')}</div>
             <div className="w-full bg-emerald-950/60 rounded-full h-2 mt-3 overflow-hidden border border-emerald-500/30">
               <div 
                 className="bg-emerald-400 h-2 rounded-full transition-all duration-500" 
@@ -192,7 +180,7 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
             </div>
             <div className="flex items-center justify-between w-full text-[11px] text-emerald-200 mt-2 font-medium">
               <span>{stats.completed} Done</span>
-              <span>{stats.pending} Remaining</span>
+              <span>{stats.pending} Pending</span>
             </div>
           </div>
         </div>
@@ -217,195 +205,132 @@ export default function RoadmapPage({ onNavigateToAssessment }) {
               onClick={onNavigateToAssessment}
               className="px-3 py-1 bg-rose-600 hover:bg-rose-700 text-white text-xs font-semibold rounded-lg transition-colors flex items-center space-x-1"
             >
-              <span>Take Assessment</span>
-              <ArrowRight className="w-3.5 h-3.5" />
+              <span>{t('hero_btn_assessment')}</span>
+              <ArrowRight className="w-3 h-3" />
             </button>
           )}
         </div>
       )}
 
-      {/* Filter & Generation Controls Bar */}
-      <div className="bg-white rounded-2xl p-4 shadow-sm border border-slate-200 space-y-4">
+      {/* Filter Controls Bar */}
+      <div className="bg-white rounded-2xl p-4 border border-slate-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-4">
         
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          
-          {/* Pillar Tabs */}
-          <div className="flex items-center space-x-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
-            {pillarsList.map(p => (
-              <button
-                key={p.slug}
-                onClick={() => setSelectedPillar(p.slug)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all ${
-                  selectedPillar === p.slug
-                    ? 'bg-emerald-600 text-white shadow-sm'
-                    : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
-                }`}
-              >
-                {p.name}
-              </button>
-            ))}
-          </div>
-
-          {/* Actions & Status Filter */}
-          <div className="flex items-center space-x-3 justify-end">
-            
-            {/* Status Selector */}
-            <div className="flex items-center bg-slate-100 rounded-xl p-1 text-xs">
-              <button
-                onClick={() => setSelectedStatus('ALL')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  selectedStatus === 'ALL' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600'
-                }`}
-              >
-                All Status
-              </button>
-              <button
-                onClick={() => setSelectedStatus('PENDING')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  selectedStatus === 'PENDING' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600'
-                }`}
-              >
-                Pending
-              </button>
-              <button
-                onClick={() => setSelectedStatus('COMPLETED')}
-                className={`px-2.5 py-1 rounded-lg font-medium transition-colors ${
-                  selectedStatus === 'COMPLETED' ? 'bg-white text-slate-900 font-semibold shadow-xs' : 'text-slate-600'
-                }`}
-              >
-                Completed
-              </button>
-            </div>
-
-            {/* Re-generate Roadmap Button */}
+        {/* Pillar Tabs */}
+        <div className="flex items-center flex-wrap gap-1.5 w-full md:w-auto">
+          {pillarsList.map((p) => (
             <button
-              onClick={() => handleGenerateTasks(false)}
-              disabled={genLoading}
-              className="px-4 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-semibold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center space-x-1.5 disabled:opacity-50"
-              title="Refresh / Auto-Generate Tasks from Assessment"
+              key={p.slug}
+              onClick={() => setSelectedPillar(p.slug)}
+              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+                selectedPillar === p.slug
+                  ? 'bg-emerald-600 text-white shadow-sm font-bold'
+                  : 'bg-slate-50 text-slate-600 hover:bg-slate-100 hover:text-slate-900 border border-slate-200'
+              }`}
             >
-              <Sparkles className={`w-3.5 h-3.5 text-emerald-600 ${genLoading ? 'animate-spin' : ''}`} />
-              <span>{genLoading ? 'Generating...' : 'Refresh Tasks'}</span>
+              {p.name}
             </button>
-
-          </div>
+          ))}
         </div>
+
+        {/* Status Filter */}
+        <div className="flex items-center space-x-2 self-end md:self-auto">
+          <span className="text-xs font-semibold text-slate-500">Status:</span>
+          <select
+            value={selectedStatus}
+            onChange={(e) => setSelectedStatus(e.target.value)}
+            className="px-3 py-1.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+          >
+            <option value="ALL">{t('roadmap_all_status')}</option>
+            <option value="PENDING">{t('roadmap_pending')}</option>
+            <option value="COMPLETED">{t('roadmap_completed')}</option>
+          </select>
+        </div>
+
       </div>
 
-      {/* Task Checklist Items List */}
-      {loading || genLoading ? (
-        <div className="p-12 bg-white rounded-2xl border border-slate-200 flex flex-col items-center justify-center text-slate-500 space-y-3">
-          <RefreshCw className="w-6 h-6 animate-spin text-emerald-600" />
-          <span className="text-sm font-medium">Loading your ReStart Kit roadmap...</span>
+      {/* Task List */}
+      {loading ? (
+        <div className="p-12 text-center text-slate-500 space-y-3 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <RefreshCw className="w-6 h-6 animate-spin text-emerald-600 mx-auto" />
+          <p className="text-xs font-semibold">Loading roadmap checklist...</p>
         </div>
       ) : tasks.length === 0 ? (
-        <div className="bg-white rounded-2xl p-10 border border-slate-200 text-center space-y-4">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
-            {isAdmin ? <ShieldCheck className="w-6 h-6 text-purple-600" /> : <Layers className="w-6 h-6 text-emerald-600" />}
+        <div className="p-10 text-center text-slate-500 space-y-4 bg-white rounded-2xl border border-slate-200 shadow-sm">
+          <div className="w-12 h-12 rounded-full bg-slate-100 flex items-center justify-center mx-auto text-slate-400">
+            <Layers className="w-6 h-6" />
           </div>
-
-          <h3 className="text-lg font-bold text-slate-900">
-            {isAdmin ? 'Welcome, System Administrator' : 'No Roadmap Tasks Found'}
-          </h3>
-
-          <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
-            {isAdmin
-              ? 'You are logged in as an Administrator. You can complete a sample assessment to test user task generation, or manage community resources.'
-              : stats.total === 0
-                ? 'Please complete your Needs & Goals Assessment to auto-generate your step-by-step fresh start roadmap.'
-                : 'No tasks match your selected filter options.'}
+          <p className="text-xs max-w-sm mx-auto leading-relaxed">
+            {t('roadmap_empty')}
           </p>
-
-          <div className="pt-2 flex justify-center space-x-3">
-            {stats.total === 0 ? (
-              <button
-                onClick={onNavigateToAssessment}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
-              >
-                <span>{isAdmin ? 'Take Sample Assessment' : 'Take Assessment Now'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setSelectedPillar('ALL');
-                  setSelectedStatus('ALL');
-                }}
-                className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl"
-              >
-                Reset Filters
-              </button>
-            )}
-          </div>
+          {onNavigateToAssessment && (
+            <button
+              onClick={onNavigateToAssessment}
+              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm transition-all inline-flex items-center space-x-1.5"
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>{t('hero_btn_assessment')}</span>
+            </button>
+          )}
         </div>
       ) : (
         <div className="space-y-3">
           {tasks.map((task) => {
-            const PillarIcon = getPillarIcon(task.pillar?.slug);
+            const Icon = getPillarIcon(task.pillar?.slug);
+            const priorityStyle = getPriorityStyle(task.priority);
             return (
-              <div 
+              <div
                 key={task.id}
-                className={`bg-white rounded-2xl p-5 shadow-sm border transition-all flex items-start space-x-4 ${
-                  task.isCompleted 
-                    ? 'bg-slate-50/70 border-slate-200 opacity-80' 
-                    : 'border-slate-200 hover:border-slate-300 hover:shadow-md'
+                className={`p-4 sm:p-5 rounded-2xl border transition-all flex items-start space-x-4 ${
+                  task.isCompleted
+                    ? 'bg-slate-50/80 border-slate-200 opacity-80'
+                    : 'bg-white border-slate-200 shadow-sm hover:border-emerald-300'
                 }`}
               >
-                {/* Interactive Checkbox Toggle */}
+                {/* Toggle Checkbox */}
                 <button
-                  type="button"
                   onClick={() => handleToggleTask(task.id)}
-                  className="mt-0.5 text-slate-400 hover:text-emerald-600 transition-colors focus:outline-none flex-shrink-0"
-                  title={task.isCompleted ? 'Mark incomplete' : 'Mark complete'}
+                  className="mt-0.5 focus:outline-none flex-shrink-0"
                 >
                   {task.isCompleted ? (
-                    <CheckSquare className="w-6 h-6 text-emerald-600 fill-emerald-100" />
+                    <CheckSquare className="w-5 h-5 text-emerald-600" />
                   ) : (
-                    <Square className="w-6 h-6 text-slate-400 hover:text-slate-600" />
+                    <Square className="w-5 h-5 text-slate-400 hover:text-emerald-600 transition-colors" />
                   )}
                 </button>
 
-                {/* Task Details Content */}
-                <div className="flex-grow space-y-1.5">
-                  <div className="flex items-center justify-between flex-wrap gap-2">
-                    
+                {/* Content */}
+                <div className="flex-1 space-y-1.5">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center space-x-2">
-                      {/* Pillar Icon Badge */}
-                      <span className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 font-semibold text-[11px] border border-slate-200">
-                        <PillarIcon className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>{task.pillar?.name || 'General'}</span>
+                      <span className="px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px] font-bold flex items-center space-x-1">
+                        <Icon className="w-3 h-3 text-slate-500" />
+                        <span>{task.pillar?.name}</span>
                       </span>
-
-                      {/* Priority Badge */}
-                      <span className={`px-2 py-0.5 rounded-md font-bold text-[10px] uppercase tracking-wider border ${getPriorityStyle(task.priority)}`}>
+                      <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${priorityStyle}`}>
                         {task.priority} Priority
                       </span>
                     </div>
 
-                    {/* Due Date Indicator */}
-                    {task.dueDate && (
-                      <div className="flex items-center space-x-1 text-[11px] text-slate-400 font-medium">
-                        <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                        <span>Target: {new Date(task.dueDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</span>
-                      </div>
+                    {task.targetDueDate && (
+                      <span className="text-[11px] text-slate-400 flex items-center space-x-1 font-medium">
+                        <Calendar className="w-3 h-3" />
+                        <span>Due in {task.targetDueDate ? Math.ceil((new Date(task.targetDueDate) - new Date()) / (1000 * 60 * 60 * 24)) : 7} days</span>
+                      </span>
                     )}
                   </div>
 
-                  {/* Task Title */}
-                  <h4 className={`text-base font-bold text-slate-900 ${task.isCompleted ? 'line-through text-slate-500' : ''}`}>
+                  <h3 className={`text-base font-bold ${task.isCompleted ? 'line-through text-slate-500' : 'text-slate-900'}`}>
                     {task.title}
-                  </h4>
+                  </h3>
 
-                  {/* Task Description */}
-                  <p className={`text-xs leading-relaxed ${task.isCompleted ? 'text-slate-400' : 'text-slate-600'}`}>
+                  <p className="text-xs text-slate-600 leading-relaxed max-w-3xl">
                     {task.description}
                   </p>
 
-                  {/* Completion Timestamp */}
                   {task.isCompleted && task.completedAt && (
-                    <div className="text-[11px] text-emerald-700 font-semibold flex items-center space-x-1 pt-1">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Completed on {new Date(task.completedAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                    <div className="text-[11px] text-emerald-700 pt-1 font-semibold flex items-center space-x-1">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Completed on {new Date(task.completedAt).toLocaleDateString()}</span>
                     </div>
                   )}
                 </div>

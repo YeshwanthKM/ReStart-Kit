@@ -39,6 +39,64 @@ export const translations = {
     pillars_section_title: "5 Core Reintegration Pillars",
     pillars_section_desc: "Every recommendation, task, and support resource is structured around these five essential pillars.",
 
+    // Assessment Wizard
+    assess_title: "Needs & Goals Assessment Wizard",
+    assess_subtitle: "Complete this quick 4-step survey to generate your personalized 5-Pillar ReStart Kit roadmap.",
+    assess_step1_title: "Step 1: Your Primary Situation",
+    assess_step1_desc: "Select the situation that best describes your current circumstances.",
+    assess_step2_title: "Step 2: Immediate Needs (Select all that apply)",
+    assess_step2_desc: "Choose the immediate resources you require across the 5 Reintegration Pillars.",
+    assess_step3_title: "Step 3: Top Reintegration Goals",
+    assess_step3_desc: "What are your primary goals for the next 30 to 90 days?",
+    assess_step4_title: "Step 4: Location & Neighborhood Circle",
+    assess_step4_desc: "We use your location to connect you with verified local resources nearby.",
+
+    // Assessment Buttons & Step Indicators
+    assess_btn_prev: "Previous Step",
+    assess_btn_next: "Next Step",
+    assess_btn_complete: "Complete Assessment & Build Roadmap",
+    assess_btn_submitting: "Generating Your Personalized Roadmap...",
+
+    // Situation Titles & Descs
+    sit_justice_title: "Reentering Community",
+    sit_justice_desc: "Returning home or rebuilding after involvement with the justice system.",
+    sit_housing_title: "Housing Insecurity",
+    sit_housing_desc: "Currently facing homelessness, emergency shelter stay, or temporary housing.",
+    sit_unemp_title: "Job Loss or Displacement",
+    sit_unemp_desc: "Seeking stable employment, vocational training, or career transition.",
+    sit_docs_title: "Missing Identity Records",
+    sit_docs_desc: "Lacking state ID, driver’s license, birth certificate, or vital papers.",
+    sit_fresh_title: "General Reintegration",
+    sit_fresh_desc: "Starting over in a new city or seeking comprehensive community support.",
+
+    // Need Item Labels
+    need_state_id: "State ID / Aadhaar / Driver License Guidance",
+    need_birth_cert: "Birth Certificate Assistance",
+    need_ssn: "Ration Card / Government ID Support",
+    need_legal_aid: "Legal Documentation & Legal Aid Support",
+    need_shelter: "Emergency Shelter / Transitional Housing",
+    need_food: "Food Assistance & Amma Unavagam Food Centers",
+    need_healthcare: "Healthcare & Medical Services",
+    need_emergency_fund: "Basic Essentials & Clothing Support",
+    need_vocational: "Vocational & Trade Skills Training (TNSDC / ITI)",
+    need_digital: "Digital Literacy & Computer Basics",
+    need_resume: "Resume & Job Application Training",
+    need_ged: "GED / High School Equivalency Prep",
+    need_fair_chance: "Fair-Chance Employment Network",
+    need_interview: "Interview Preparation & Coaching",
+    need_entry_level: "Immediate Entry-Level Opportunities",
+    need_apprenticeship: "Paid Apprenticeships & Internships",
+    need_mentorship: "One-on-One Peer Mentorship",
+    need_ngo: "Local NGO & Non-Profit Assistance",
+    need_support_group: "Support Groups & Reentry Circles",
+
+    // Goal Item Labels
+    goal_obtain_id: "Obtain / Recover Official Photo ID & Documents",
+    goal_get_job: "Secure Stable Fair-Chance Employment",
+    goal_learn_trade: "Complete Vocational Skill Certification",
+    goal_housing: "Move into Permanent Independent Housing",
+    goal_stability: "Achieve Long-Term Personal & Family Stability",
+
     // Dashboard
     dash_title: "My Reintegration Dashboard",
     dash_subtitle: "Track your overall progress across all 5 pillars and take your next steps.",
@@ -131,6 +189,64 @@ export const translations = {
     pillars_section_title: "5 முக்கிய மறுவாழ்வு தூண்கள்",
     pillars_section_desc: "ஒவ்வொரு பரிந்துரையும், பணியும், வளமும் இந்த 5 அத்தியாவசிய தூண்களின் கீழ் கட்டமைக்கப்பட்டுள்ளது.",
 
+    // Assessment Wizard
+    assess_title: "தேவை மற்றும் இலக்குகள் கணக்கெடுப்பு",
+    assess_subtitle: "உங்கள் 5-தூண் ரீஸ்டார்ட் வழிகாட்டி பட்டியலை உருவாக்க இந்த 4-படி கணக்கெடுப்பை முடிக்கவும்.",
+    assess_step1_title: "படி 1: உங்கள் தற்போதைய நிலை",
+    assess_step1_desc: "உங்கள் தற்போதைய சூழ்நிலையை சிறப்பாக விவரிக்கும் விருப்பத்தைத் தேர்ந்தெடுக்கவும்.",
+    assess_step2_title: "படி 2: உடனடி தேவைகள் (பொருந்தக்கூடிய அனைத்தையும் தேர்வு செய்க)",
+    assess_step2_desc: "5 மறுவாழ்வு தூண்களின் கீழ் உங்களுக்குத் தேவையான வளங்களைத் தேர்ந்தெடுக்கவும்.",
+    assess_step3_title: "படி 3: முதன்மை மறுவாழ்வு இலக்குகள்",
+    assess_step3_desc: "அடுத்த 30 முதல் 90 நாட்களுக்கான உங்கள் முக்கிய இலக்குகள் யாவை?",
+    assess_step4_title: "படி 4: இருப்பிடம் மற்றும் வட்டாரம்",
+    assess_step4_desc: "அருகிலுள்ள சரிபார்க்கப்பட்ட உள்ளூர் வளங்களுடன் உங்களை இணைக்க இருப்பிடத்தைப் பயன்படுத்துகிறோம்.",
+
+    // Assessment Buttons & Step Indicators
+    assess_btn_prev: "முந்தைய படி",
+    assess_btn_next: "அடுத்த படி",
+    assess_btn_complete: "கணக்கெடுப்பை முடித்து வழிகாட்டியை உருவாக்கு",
+    assess_btn_submitting: "உங்கள் வழிகாட்டி உருவாக்கப்படுகிறது...",
+
+    // Situation Titles & Descs
+    sit_justice_title: "சமுதாயத்தில் மீண்டும் இணைதல்",
+    sit_justice_desc: "சட்ட அமைப்பின் தொடர்பிற்கு பிறகு வீடு திரும்புதல் அல்லது வாழ்க்கையை மீண்டும் அமைத்தல்.",
+    sit_housing_title: "இருப்பிட இன்மை",
+    sit_housing_desc: "தற்போது வீடற்ற நிலை, அவசர தங்குமிடம் அல்லது தற்காலிக தங்குமிடத்தில் இருத்தல்.",
+    sit_unemp_title: "வேலை இழப்பு அல்லது வேலை தேடுதல்",
+    sit_unemp_desc: "நிலையான வேலைவாய்ப்பு, தொழிற்பயிற்சி அல்லது தொழில் மாற்றம் தேடுதல்.",
+    sit_docs_title: "விடுபட்ட அடையாள ஆவணங்கள்",
+    sit_docs_desc: "அடையாள அட்டை, ஓட்டுநர் உரிமம், பிறப்புச் சான்றிதழ் இல்லாத நிலை.",
+    sit_fresh_title: "பொதுவான புதிய தொடக்கம்",
+    sit_fresh_desc: "புதிய நகரில் மீண்டும் தொடங்குதல் அல்லது விரிவான சமூக ஆதரவை தேடுதல்.",
+
+    // Need Item Labels
+    need_state_id: "அடையாள அட்டை / ஆதார் / ஓட்டுனர் உரிமம் வழிகாட்டுதல்",
+    need_birth_cert: "பிறப்பு சான்றிதழ் உதவி",
+    need_ssn: "ரேஷன் கார்டு / அரசு அடையாள அட்டை உதவி",
+    need_legal_aid: "சட்ட ஆவணங்கள் மற்றும் இலவச சட்ட உதவி ஆதரவு",
+    need_shelter: "அவசர தங்குமிடம் / தற்காலிக குடியிருப்பு",
+    need_food: "உணவு உதவி & அம்மா உணவக மையங்கள்",
+    need_healthcare: "மருத்துவ உதவி & சுகாதார சேவைகள்",
+    need_emergency_fund: "அடிப்படை தேவைகள் & ஆடைகள் உதவி",
+    need_vocational: "தொழிற் பயிற்சி (TNSDC / அரசு ITI)",
+    need_digital: "கணினி கல்வி & டிஜிட்டல் அடிப்படை பயிற்சி",
+    need_resume: "ரெஸ்யூம் & வேலை விண்ணப்ப பயிற்சி",
+    need_ged: "கல்வி தகுதி மேம்பாட்டு பயிற்சி",
+    need_fair_chance: "வேலைவாய்ப்பு முகாம் & நியாயமான வேலைகள்",
+    need_interview: "நேர்காணல் பயிற்சி மற்றும் ஆலோசனை",
+    need_entry_level: "உடனடி வேலை வாய்ப்புகள்",
+    need_apprenticeship: "கட்டண பயிற்சி (Apprenticeships / Internships)",
+    need_mentorship: "1-on-1 தனிநபர் வழிகாட்டுதல்",
+    need_ngo: "உள்ளூர் தொண்டு நிறுவனங்கள் உதவி",
+    need_support_group: "சமூக மறுவாழ்வு ஆதரவு குழுக்கள்",
+
+    // Goal Item Labels
+    goal_obtain_id: "அதிகாரப்பூர்வ அடையாள அட்டை மற்றும் ஆவணங்களைப் பெறுதல்",
+    goal_get_job: "நிலையான நியாயமான வேலைவாய்ப்பைப் பெறுதல்",
+    goal_learn_trade: "தொழிற்பயிற்சி சான்றிதழை முடித்தல்",
+    goal_housing: "நிரந்தர தனி குடியிருப்புக்கு மாறுதல்",
+    goal_stability: "நீண்டகால தனிநபர் மற்றும் குடும்ப நிலைத்தன்மை அடைதல்",
+
     // Dashboard
     dash_title: "என் மறுவாழ்வு டாஷ்போர்டு",
     dash_subtitle: "5 தூண்களிலும் உங்கள் முன்னேற்றத்தைக் கண்காணித்து அடுத்த கட்ட நடவடிக்கைகளை எடுக்கவும்.",
@@ -222,6 +338,64 @@ export const translations = {
     pillar_community_desc: "पुनर्वास सहायता नेटवर्क, 1-ऑन-1 परामर्श और कल्याणकारी संगठन।",
     pillars_section_title: "5 मुख्य पुनर्वास स्तंभ",
     pillars_section_desc: "प्रत्येक अनुशंसा, कार्य और सहायता संसाधन इन 5 आवश्यक स्तंभों के आसपास निर्मित है।",
+
+    // Assessment Wizard
+    assess_title: "आवश्यकता एवं लक्ष्य मूल्यांकन",
+    assess_subtitle: "अपनी 5-स्तंभ कार्यसूची बनाने के लिए यह 4-चरणीय सर्वेक्षण पूरा करें।",
+    assess_step1_title: "चरण 1: आपकी प्राथमिक स्थिति",
+    assess_step1_desc: "वह स्थिति चुनें जो आपकी वर्तमान परिस्थितियों का सबसे अच्छा वर्णन करती है।",
+    assess_step2_title: "चरण 2: तत्काल आवश्यकताएं (लागू होने वाले सभी चुनें)",
+    assess_step2_desc: "5 पुनर्वास स्तंभों में अपनी आवश्यकता के अनुसार संसाधन चुनें।",
+    assess_step3_title: "चरण 3: प्राथमिक पुनर्वास लक्ष्य",
+    assess_step3_desc: "अगले 30 से 90 दिनों के लिए आपके प्राथमिक लक्ष्य क्या हैं?",
+    assess_step4_title: "चरण 4: स्थान और पड़ोस का दायरा",
+    assess_step4_desc: "हम आपको आस-पास के सत्यापित स्थानीय संसाधनों से जोड़ने के लिए आपके स्थान का उपयोग करते हैं।",
+
+    // Assessment Buttons & Step Indicators
+    assess_btn_prev: "पिछला चरण",
+    assess_btn_next: "अगला चरण",
+    assess_btn_complete: "मूल्यांकन पूरा करें और कार्यसूची बनाएं",
+    assess_btn_submitting: "आपकी कार्यसूची बनाई जा रही है...",
+
+    // Situation Titles & Descs
+    sit_justice_title: "समुदाय में पुनरागमन",
+    sit_justice_desc: "कानूनी व्यवस्था से जुड़े होने के बाद घर वापस आना या जीवन का पुनर्निर्माण करना।",
+    sit_housing_title: "आवास असुरक्षा",
+    sit_housing_desc: "वर्तमान में बेघर होना, आपातकालीन आश्रय में रहना या अस्थायी आवास।",
+    sit_unemp_title: "नौकरी का नुकसान या विस्थापन",
+    sit_unemp_desc: "स्थिर रोजगार, व्यावसायिक प्रशिक्षण या करियर परिवर्तन की तलाश।",
+    sit_docs_title: "लापता पहचान रिकॉर्ड",
+    sit_docs_desc: "राज्य पहचान पत्र, ड्राइविंग लाइसेंस, जन्म प्रमाण पत्र का अभाव।",
+    sit_fresh_title: "सामान्य पुनर्वास",
+    sit_fresh_desc: "नए शहर में नई शुरुआत या व्यापक सामुदायिक सहायता की तलाश।",
+
+    // Need Item Labels
+    need_state_id: "राज्य पहचान पत्र / आधार / ड्राइविंग लाइसेंस मार्गदर्शन",
+    need_birth_cert: "जन्म प्रमाण पत्र सहायता",
+    need_ssn: "राशन कार्ड / सरकारी पहचान पत्र सहायता",
+    need_legal_aid: "कानूनी दस्तावेज़ और मुफ्त कानूनी सहायता",
+    need_shelter: "आपातकालीन आश्रय / संक्रमणकालीन आवास",
+    need_food: "भोजन सहायता और खाद्य बैंक",
+    need_healthcare: "स्वास्थ्य सेवाएँ और चिकित्सा सहायता",
+    need_emergency_fund: "बुनियादी जरूरतें और वस्त्र सहायता",
+    need_vocational: "व्यावसायिक एवं ट्रेड कौशल प्रशिक्षण (TNSDC / ITI)",
+    need_digital: "कंप्यूटर साक्षरता और बुनियादी ज्ञान",
+    need_resume: "रिज्यूमे और नौकरी आवेदन प्रशिक्षण",
+    need_ged: "शैक्षणिक योग्यता सुधार प्रशिक्षण",
+    need_fair_chance: "निष्पक्ष रोजगार अवसर नेटवर्क",
+    need_interview: "साक्षात्कार की तैयारी और कोचिंग",
+    need_entry_level: "तत्काल प्रवेश स्तर के अवसर",
+    need_apprenticeship: "सशुल्क प्रशिक्षिक्षुता (Apprenticeships / Internships)",
+    need_mentorship: "1-ऑन-1 व्यक्तिगत परामर्श",
+    need_ngo: "स्थानीय गैर सरकारी संगठन सहायता",
+    need_support_group: "पुनर्वास सहायता समूह",
+
+    // Goal Item Labels
+    goal_obtain_id: "आधिकारिक फोटो पहचान पत्र और दस्तावेज़ प्राप्त करना",
+    goal_get_job: "सुरक्षित स्थिर निष्पक्ष रोजगार प्राप्त करना",
+    goal_learn_trade: "व्यावसायिक कौशल प्रमाणन पूरा करना",
+    goal_housing: "स्थायी स्वतंत्र आवास में जाना",
+    goal_stability: "दीर्घकालिक व्यक्तिगत और पारिवारिक स्थिरता प्राप्त करना",
 
     // Dashboard
     dash_title: "मेरा पुनर्वास डैशबोर्ड",
