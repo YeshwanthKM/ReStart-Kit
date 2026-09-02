@@ -5,6 +5,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import RegisterPage from './pages/RegisterPage';
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage';
+import AssessmentPage from './pages/AssessmentPage';
 import { 
   CheckCircle2, 
   XCircle, 
@@ -17,7 +18,8 @@ import {
   ShieldCheck,
   Compass,
   ArrowRight,
-  UserCheck
+  UserCheck,
+  ClipboardCheck
 } from 'lucide-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
@@ -110,16 +112,22 @@ function MainContent({ currentView, setCurrentView }) {
         {/* View Switcher */}
         {currentView === 'register' && (
           <RegisterPage 
-            onSuccess={() => setCurrentView('profile')} 
+            onSuccess={() => setCurrentView('assessment')} 
             onSwitchToLogin={() => setCurrentView('login')} 
           />
         )}
 
         {currentView === 'login' && (
           <LoginPage 
-            onSuccess={() => setCurrentView('profile')} 
+            onSuccess={() => setCurrentView('assessment')} 
             onSwitchToRegister={() => setCurrentView('register')} 
           />
+        )}
+
+        {currentView === 'assessment' && (
+          <ProtectedRoute onRedirect={(view) => setCurrentView(view)}>
+            <AssessmentPage onComplete={() => setCurrentView('home')} />
+          </ProtectedRoute>
         )}
 
         {currentView === 'profile' && (
@@ -165,13 +173,22 @@ function MainContent({ currentView, setCurrentView }) {
                       </button>
                     </>
                   ) : (
-                    <button 
-                      onClick={() => setCurrentView('profile')}
-                      className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
-                    >
-                      <UserCheck className="w-4 h-4 text-emerald-700" />
-                      <span>Manage Your Profile</span>
-                    </button>
+                    <>
+                      <button 
+                        onClick={() => setCurrentView('assessment')}
+                        className="px-5 py-2.5 bg-white hover:bg-emerald-50 text-emerald-900 font-bold text-sm rounded-xl shadow-md transition-all flex items-center space-x-2"
+                      >
+                        <ClipboardCheck className="w-4 h-4 text-emerald-700" />
+                        <span>Take Assessment</span>
+                      </button>
+
+                      <button 
+                        onClick={() => setCurrentView('profile')}
+                        className="px-5 py-2.5 bg-emerald-700/80 hover:bg-emerald-700 text-white font-semibold text-sm rounded-xl border border-emerald-500/50 transition-colors"
+                      >
+                        Profile Settings
+                      </button>
+                    </>
                   )}
                 </div>
               </div>

@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const healthRoutes = require('./routes/health.routes');
 const authRoutes = require('./routes/auth.routes');
 const profileRoutes = require('./routes/profile.routes');
+const assessmentRoutes = require('./routes/assessment.routes');
 
 // Load environment variables
 dotenv.config();
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/health', healthRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/profile', profileRoutes);
+app.use('/api/assessment', assessmentRoutes);
 
 // Root route
 app.get('/api', (req, res) => {
