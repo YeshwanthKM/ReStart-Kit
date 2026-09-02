@@ -1,170 +1,183 @@
 const { prisma } = require('../utils/db');
 
 const initialResources = [
-  // 1. DOCUMENTS
+  // 1. DOCUMENTS (Chennai)
   {
-    title: "Washington Department of Licensing – Photo ID Center",
-    organization: "Washington State Department of Licensing",
-    description: "Assistance with official state photo IDs, driver license replacement, and residency documentation guidance.",
+    title: "Chennai District Collectorate – Aadhaar & Official ID Seva Kendra",
+    organization: "District Revenue & Administration Department",
+    description: "Assistance with official state photo IDs, Aadhaar registration, Ration Card updates, and residency documentation guidance.",
     pillarSlug: "DOCUMENTS",
     categorySlug: "GOVERNMENT_ID",
     categoryName: "Government ID & Licensing",
-    address: "2424 4th Ave S",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(360) 902-3900 | customercare@dol.wa.gov",
-    website: "https://dol.wa.gov"
+    address: "Rajaji Salai, George Town",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-25268000 | collector-chn@nic.in",
+    website: "https://chennai.nic.in"
   },
   {
-    title: "Oregon Driver & Motor Vehicle Services (DMV)",
-    organization: "Oregon ODOT DMV",
-    description: "Official state identification card processing, birth record verification support, and fee waiver guidance.",
+    title: "Regional Passport Office & Identity Services – Chennai",
+    organization: "Ministry of External Affairs, Govt of India",
+    description: "Official identity verification, passport issuance, birth record verification support, and official document guidance.",
     pillarSlug: "DOCUMENTS",
     categorySlug: "GOVERNMENT_ID",
     categoryName: "Government ID & Licensing",
-    address: "1500 SW 6th Ave",
-    city: "Portland",
-    state: "OR",
-    contactInfo: "(503) 299-9999 | dmvinfo@oregon.gov",
-    website: "https://oregon.gov/odot/dmv"
+    address: "Rayala Towers, 158 Anna Salai",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-28518848 | rpo.chennai@mea.gov.in",
+    website: "https://passportindia.gov.in"
   },
   {
-    title: "Northwest Justice Project – Legal Aid Center",
-    organization: "Northwest Justice Project",
-    description: "Free civil legal aid, record clearing guidance, and legal identification restoration for eligible individuals.",
+    title: "Tamil Nadu State Legal Services Authority (TNSLSA) – Free Legal Aid",
+    organization: "High Court Legal Services Committee",
+    description: "Free legal assistance, legal aid counsel, record clearing guidance, and legal identification restoration for eligible individuals.",
     pillarSlug: "DOCUMENTS",
     categorySlug: "LEGAL_AID",
     categoryName: "Legal Aid & Record Clearing",
-    address: "401 Second Ave S, Suite 407",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(206) 464-1519 | info@nwjustice.org",
-    website: "https://nwjustice.org"
+    address: "High Court Campus, Egmore",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-25342834 | tnslsa@tn.gov.in",
+    website: "https://tnslsa.tn.gov.in"
   },
 
-  // 2. BASIC NEEDS
+  // 2. BASIC NEEDS (Chennai)
   {
-    title: "Compass Housing Alliance Shelter Center",
-    organization: "Compass Housing Alliance",
-    description: "Emergency shelter, supportive housing placement, hot meals, laundry facilities, and mail service.",
+    title: "Greater Chennai Corporation – Night Shelter & Housing Center",
+    organization: "Greater Chennai Corporation (GCC)",
+    description: "Free emergency shelter, transitional housing placement, hot meals, drinking water, and safe accommodation.",
     pillarSlug: "BASIC_NEEDS",
     categorySlug: "HOUSING_SHELTER",
     categoryName: "Housing & Shelter",
-    address: "77 S Washington St",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(206) 474-1000 | info@compasshousingalliance.org",
-    website: "https://compasshousingalliance.org"
+    address: "Wall Tax Road, Chennai Central",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-25619200 | commissioner@chennaicorporation.gov.in",
+    website: "https://chennaicorporation.gov.in"
   },
   {
-    title: "Blanchet House Meals & Housing Center",
-    organization: "Blanchet House of Hospitality",
-    description: "Free daily hot meal service, transitional housing for men, clothing distribution, and peer support.",
+    title: "Amma Unavagam & Community Welfare Meal Center",
+    organization: "Chennai Municipal Corporation Food Assistance",
+    description: "Highly subsidized daily nutritious breakfast, lunch, and dinner services for community members in need.",
     pillarSlug: "BASIC_NEEDS",
     categorySlug: "FOOD_ESSENTIALS",
     categoryName: "Food & Basic Essentials",
-    address: "310 NW Glisan St",
-    city: "Portland",
-    state: "OR",
-    contactInfo: "(503) 241-4340 | info@blanchethouse.org",
-    website: "https://blanchethouse.org"
+    address: "Prakasam Road, T. Nagar",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "1913 (GCC Helpline) | info@chennaicorporation.gov.in",
+    website: "https://chennaicorporation.gov.in"
   },
   {
-    title: "Northwest Harvest Food Bank Center",
-    organization: "Northwest Harvest Network",
-    description: "Community food bank network supplying fresh produce, essential groceries, and hygiene products.",
+    title: "Akshaya Patra Foundation – Community Food Center",
+    organization: "Akshaya Patra Foundation India",
+    description: "Community food relief distribution, essential groceries, hygiene kits, and nutrition support.",
     pillarSlug: "BASIC_NEEDS",
     categorySlug: "FOOD_ESSENTIALS",
     categoryName: "Food & Basic Essentials",
-    address: "1914 N 34th St, Suite 500",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(800) 722-6924 | info@northwestharvest.org",
-    website: "https://northwestharvest.org"
+    address: "GST Road, Tambaram Sanatorium",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-22410010 | infochennai@akshayapatra.org",
+    website: "https://akshayapatra.org"
   },
 
-  // 3. SKILLS
+  // 3. SKILLS (Chennai)
   {
-    title: "FareStart Culinary & Vocational Academy",
-    organization: "FareStart Non-Profit Training",
-    description: "Paid culinary job training, digital literacy workshops, life skills coaching, and job placement assistance.",
+    title: "Tamil Nadu Skill Development Corporation (TNSDC) Center",
+    organization: "TNSDC Government Skill Academy",
+    description: "Free vocational skill training programs, computer literacy courses, digital skills certification, and job placement.",
     pillarSlug: "SKILLS",
     categorySlug: "VOCATIONAL_TRAINING",
     categoryName: "Vocational & Trade Training",
-    address: "700 Virginia St",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(206) 443-1233 | info@farestart.org",
-    website: "https://farestart.org"
+    address: "Guindy Industrial Estate, Guindy",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-22500107 | info@tnsdc.in",
+    website: "https://tnsdc.in"
   },
   {
-    title: "Portland Community College Opportunity Center",
-    organization: "Portland Community College",
-    description: "GED preparation classes, computer training labs, career pathway certifications, and financial aid guidance.",
+    title: "Government Industrial Training Institute (ITI) – Guindy",
+    organization: "Department of Employment & Training, Tamil Nadu",
+    description: "Technical trades, electrician & mechanical training, basic computer operation, and diploma preparation.",
     pillarSlug: "SKILLS",
     categorySlug: "DIGITAL_LITERACY",
     categoryName: "Digital Literacy & Education",
-    address: "5600 NE 42nd Ave",
-    city: "Portland",
-    state: "OR",
-    contactInfo: "(971) 722-2000 | admissions@pcc.edu",
-    website: "https://pcc.edu"
+    address: "Mount Road, Guindy",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-22500416 | itiguindy@tn.gov.in",
+    website: "https://skilltraining.tn.gov.in"
+  },
+  {
+    title: "Chennai Community Digital Literacy & Computer Training Lab",
+    organization: "Digital India Skill Foundation",
+    description: "Free hands-on computer basics, MS Office training, internet skills, typing, and resume writing workshops.",
+    pillarSlug: "SKILLS",
+    categorySlug: "DIGITAL_LITERACY",
+    categoryName: "Digital Literacy & Education",
+    address: "100 Feet Road, Velachery",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-42001122 | digital@chennaiskills.org",
+    website: "https://skilltraining.tn.gov.in"
   },
 
-  // 4. EMPLOYMENT
+  // 4. EMPLOYMENT (Chennai)
   {
-    title: "WorkSource Seattle Fair-Chance Job Center",
-    organization: "WorkSource Washington",
-    description: "Comprehensive career services, fair-chance employer hiring fairs, job search assistance, and interview prep.",
+    title: "District Employment & Career Guidance Exchange – Chennai",
+    organization: "Department of Employment and Training",
+    description: "Fair-chance job registration, private sector job melas, career counseling, resume assistance, and job placements.",
     pillarSlug: "EMPLOYMENT",
     categorySlug: "FAIR_CHANCE_JOBS",
     categoryName: "Fair-Chance Employment",
-    address: "9600 College Way N",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(206) 934-5304 | worksource@seattlecolleges.edu",
-    website: "https://worksourcewa.com"
+    address: "Santhome High Road, Mylapore",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-24615160 | deochennai@tn.gov.in",
+    website: "https://tnprivatejobs.tn.gov.in"
   },
   {
-    title: "SE Works Community Career Center",
-    organization: "SE Works Organization",
-    description: "Fair-chance job placements, trade apprenticeships, interview attire assistance, and career navigation.",
+    title: "Chennai Fair-Chance Industrial Placement Center",
+    organization: "Industrial Manufacturers Association",
+    description: "Job placements in manufacturing, logistics, retail, hospitality, and municipal service departments for reintegrating individuals.",
     pillarSlug: "EMPLOYMENT",
     categorySlug: "FAIR_CHANCE_JOBS",
     categoryName: "Fair-Chance Employment",
-    address: "7904 SE Division St",
-    city: "Portland",
-    state: "OR",
-    contactInfo: "(503) 772-2300 | info@seworks.org",
-    website: "https://seworks.org"
+    address: "Industrial Estate Road, Ambattur",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-26251234 | jobs@ambatturindustry.org",
+    website: "https://tnprivatejobs.tn.gov.in"
   },
 
-  // 5. COMMUNITY
+  // 5. COMMUNITY (Chennai)
   {
-    title: "Pioneer Human Services Reentry Network",
-    organization: "Pioneer Human Services",
-    description: "Comprehensive reentry support, 1-on-1 peer mentorship circles, substance recovery guidance, and community advocacy.",
+    title: "The Banyan Reentry & Community Mental Health Network",
+    organization: "The Banyan NGO",
+    description: "Comprehensive community reintegration, 1-on-1 peer mentorship circles, counseling, and social support services.",
     pillarSlug: "COMMUNITY",
     categorySlug: "REENTRY_NGO",
     categoryName: "Reentry Support NGO",
-    address: "740 S Michigan St",
-    city: "Seattle",
-    state: "WA",
-    contactInfo: "(206) 768-1590 | info@pioneerhumanservices.org",
-    website: "https://pioneerhumanservices.org"
+    address: "6th Main Road, Mogappair West",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-26530599 | info@thebanyan.org",
+    website: "https://thebanyan.org"
   },
   {
-    title: "Constructing Hope Mentorship & Apprenticeship",
-    organization: "Constructing Hope Non-Profit",
-    description: "Construction apprenticeship program with 1-on-1 mentorship, tool assistance, and lifelong support network.",
+    title: "Chennai Community Reintegration & Peer Mentorship Circles",
+    organization: "Tamil Nadu Social Service Forum",
+    description: "Peer support groups, community reintegration circles, family counseling, and NGO resource assistance.",
     pillarSlug: "COMMUNITY",
     categorySlug: "MENTORSHIP_CIRCLES",
     categoryName: "Peer Mentorship Circles",
-    address: "405 NE Church St",
-    city: "Portland",
-    state: "OR",
-    contactInfo: "(503) 281-1234 | info@constructinghope.org",
-    website: "https://constructinghope.org"
+    address: "Poonamallee High Road, Kilpauk",
+    city: "Chennai",
+    state: "Tamil Nadu",
+    contactInfo: "044-26421100 | contact@tnssf.org",
+    website: "https://thebanyan.org"
   }
 ];
 
@@ -173,6 +186,16 @@ const initialResources = [
  */
 const seedResources = async () => {
   try {
+    // Clear old US sample resources if they exist to replace with Chennai resources
+    const checkUsResources = await prisma.resource.findFirst({
+      where: { city: { in: ['Seattle', 'Portland'] } }
+    });
+
+    if (checkUsResources) {
+      console.log('🔄 Updating resources database to Chennai & Tamil Nadu regions...');
+      await prisma.resource.deleteMany();
+    }
+
     const existingCount = await prisma.resource.count();
     if (existingCount > 0) {
       return { success: true, seededCount: 0, message: "Resources already seeded" };
@@ -215,7 +238,7 @@ const seedResources = async () => {
       }
     }
 
-    console.log(`✅ Successfully seeded ${seededCount} verified ReStart Kit resources!`);
+    console.log(`✅ Successfully seeded ${seededCount} verified Chennai ReStart Kit resources!`);
     return { success: true, seededCount };
   } catch (err) {
     console.error("❌ Seed Resources Error:", err);

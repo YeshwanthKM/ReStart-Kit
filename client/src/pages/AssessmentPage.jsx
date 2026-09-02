@@ -30,8 +30,8 @@ export default function AssessmentPage({ onComplete }) {
   const [situation, setSituation] = useState('');
   const [selectedNeeds, setSelectedNeeds] = useState([]);
   const [selectedGoals, setSelectedGoals] = useState([]);
-  const [city, setCity] = useState(user?.profile?.city || '');
-  const [state, setState] = useState(user?.profile?.state || '');
+  const [city, setCity] = useState(user?.profile?.city || 'Chennai');
+  const [state, setState] = useState(user?.profile?.state || 'Tamil Nadu');
   const [location, setLocation] = useState(user?.profile?.location || '');
 
   // Pre-fetch existing assessment if available
@@ -416,7 +416,7 @@ export default function AssessmentPage({ onComplete }) {
                     type="text"
                     value={city}
                     onChange={(e) => setCity(e.target.value)}
-                    placeholder="e.g. Seattle"
+                    placeholder="e.g. Chennai"
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
                   />
                 </div>
@@ -430,7 +430,7 @@ export default function AssessmentPage({ onComplete }) {
                     type="text"
                     value={state}
                     onChange={(e) => setState(e.target.value)}
-                    placeholder="e.g. WA"
+                    placeholder="e.g. Tamil Nadu"
                     className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
                   />
                 </div>
@@ -438,12 +438,12 @@ export default function AssessmentPage({ onComplete }) {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-700 mb-1">Neighborhood / District (Optional)</label>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">Neighborhood / Circle (Optional)</label>
               <input
                 type="text"
                 value={location}
                 onChange={(e) => setLocation(e.target.value)}
-                placeholder="e.g. Downtown / Central District"
+                placeholder="e.g. Anna Nagar / T. Nagar / Tambaram / Guindy"
                 className="w-full px-3 py-2.5 bg-slate-50 border border-slate-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:bg-white"
               />
             </div>

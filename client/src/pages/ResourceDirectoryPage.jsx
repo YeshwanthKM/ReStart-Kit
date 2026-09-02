@@ -46,8 +46,8 @@ export default function ResourceDirectoryPage() {
   const [pillarSlug, setPillarSlug] = useState('DOCUMENTS');
   const [category, setCategory] = useState('');
   const [address, setAddress] = useState('');
-  const [city, setCity] = useState(user?.profile?.city || 'Seattle');
-  const [state, setState] = useState(user?.profile?.state || 'WA');
+  const [city, setCity] = useState(user?.profile?.city || 'Chennai');
+  const [state, setState] = useState(user?.profile?.state || 'Tamil Nadu');
   const [zipCode, setZipCode] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
