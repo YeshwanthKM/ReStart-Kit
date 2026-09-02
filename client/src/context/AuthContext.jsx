@@ -22,8 +22,12 @@ export function AuthProvider({ children }) {
             localStorage.setItem('restart_kit_user', JSON.stringify(res.data.user));
           }
         } catch (err) {
-          console.error('Auth verification failed:', err);
-          logout();
+          console.warn('Auth verification fallback:', err);
+          // Only log out if specifically 401 Unauthorized (invalid or expired JWT signature)
+          // On 404 or serverless container cold-starts, preserve local session state from localStorage!
+          if (err.response && err.response.status === 401) {
+            logout();
+          }
         }
       }
       setLoading(false);
@@ -58,17 +62,17 @@ export function AuthProvider({ children }) {
   };
 
   const updateProfile = async (profileData) => {
-    const res = await api.put('/profile/me', profileData);
+    const res = await api.put('/profile', profileData);
     if (res.data.success) {
       const updatedProfile = res.data.profile;
       setUser(prev => {
-        const updated = { ...prev, profile: updatedProfile };
-        localStorage.setItem('restart_kit_user', JSON.stringify(updated));
-        return updated;
+        const newUser = { ...prev, profile: updatedProfile };
+        localStorage.setItem('restart_kit_user', JSON.stringify(newUser));
+        return newUser;
       });
       return updatedProfile;
     }
-    throw new Error(res.data.message || 'Profile update failed');
+    throw new Error(res.data.message || 'Failed to update profile');
   };
 
   const logout = () => {
@@ -78,18 +82,23 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('restart_kit_user');
   };
 
+  const isAuthenticated = !!token && !!user;
+  const isAdmin = user?.role === 'ADMIN';
+
   return (
-    <AuthContext.Provider value={{
-      user,
-      token,
-      loading,
-      isAuthenticated: !!user,
-      isAdmin: user?.role === 'ADMIN',
-      login,
-      register,
-      logout,
-      updateProfile
-    }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        token,
+        loading,
+        isAuthenticated,
+        isAdmin,
+        login,
+        register,
+        updateProfile,
+        logout
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
